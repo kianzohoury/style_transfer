@@ -34,15 +34,16 @@ class LossLayer(nn.Module):
 
 
 class StyleTransferNet(nn.Module):
+    """Wrapper class that creates additional layers for retrieving losses."""
     def __init__(
-            self,
-            model: nn.Module,
-            content_image: torch.Tensor,
-            style_image: torch.Tensor,
-            content_labels: List[str],
-            style_labels: List[str],
-            mean: List[float],
-            std: List[float]
+        self,
+        model: nn.Module,
+        content_image: torch.Tensor,
+        style_image: torch.Tensor,
+        content_labels: List[str],
+        style_labels: List[str],
+        mean: List[float],
+        std: List[float]
     ):
         super(StyleTransferNet, self).__init__()
         self.input_size = content_image.size()

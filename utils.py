@@ -21,6 +21,8 @@ def tensor_to_image(img_tensor: torch.Tensor) -> Image.Image:
     """Converts an image tensor to a PIL Image."""
     img_tensor = img_tensor.cpu().clone()
     img_tensor = img_tensor.squeeze(0) if img_tensor.dim() == 4 else img_tensor
+    with torch.no_grad():
+        img_tensor.clamp_(0, 1)
     img = TF.to_pil_image(img_tensor)
     return img
 
