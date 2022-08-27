@@ -35,19 +35,22 @@ class LossLayer(nn.Module):
 
 class StyleTransferNet(nn.Module):
     def __init__(
-        self,
-        model: nn.Module,
-        content_image: torch.Tensor,
-        style_image: torch.Tensor,
-        content_labels: List[str],
-        style_labels: List[str],
-        mean: List[float],
-        std: List[float]
+            self,
+            model: nn.Module,
+            content_image: torch.Tensor,
+            style_image: torch.Tensor,
+            content_labels: List[str],
+            style_labels: List[str],
+            mean: List[float],
+            std: List[float]
     ):
         super(StyleTransferNet, self).__init__()
         self.input_size = content_image.size()
         self.network = nn.Sequential()
-        self.network.add_module("input_norm", InputNorm(mean=mean, std=std))
+        self.network.add_module(
+            "input_norm",
+            InputNorm(mean=mean, std=std).to(content_image.device)
+        )
         self.content_layers = []
         self.style_layers = []
 
@@ -97,10 +100,10 @@ class StyleTransferNet(nn.Module):
             if label == content_labels[-1] or label == style_labels[-1]:
                 break
 
-    def forward(self, image: torch.Tensor) -> Tuple[..., List[LossLayer]]:
+    def forward(self, image: torch.Tensor) -> List[List[LossLayer]]:
         """Returns the content and style layers as a tuple of lists."""
         _ = self.network(image)
-        return self.content_layers, self.style_layers
+        return [self.content_layers, self.style_layers]
 
 
 def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
