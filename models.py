@@ -68,7 +68,7 @@ class StyleTransferNet(nn.Module):
             elif isinstance(layer, nn.BatchNorm2d):
                 label = f"bn_{i}_{j}"
             elif isinstance(layer, nn.MaxPool2d):
-                # Use avg pooling for instead.
+                # Use avg pooling instead.
                 kernel_size = layer.kernel_size
                 stride = layer.stride
                 padding = layer.padding
