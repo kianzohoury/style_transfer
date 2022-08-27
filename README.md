@@ -17,7 +17,7 @@ with additional features.
 ## Install
 Clone the repo to install:
 ```
-https://github.com/kianzohoury/style_transfer.git
+$ git clone https://github.com/kianzohoury/style_transfer.git
 ```
 
 ## Usage
@@ -30,3 +30,4 @@ $ python3 style_transfer path/to/content_img path/to/style_img
 --tv-reg \
 --device cuda
 ```
+
