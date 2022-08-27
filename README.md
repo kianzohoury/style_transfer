@@ -20,3 +20,13 @@ Clone the repo to install:
 https://github.com/kianzohoury/style_transfer.git
 ```
 
+## Usage
+```
+style_transfer path/to/content_img path/to/style_img
+--save path/to/output \
+--iters 300 \
+--beta 0.0001 \
+--lr 1.0 \
+--tv-reg \
+--device cuda
+```
