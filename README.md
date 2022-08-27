@@ -1,5 +1,6 @@
 # Neural Style Transfer
-A PyTorch implementation of [Image Style Transfer Using Convolutional Neural Networks](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf).
+A PyTorch implementation of [Image Style Transfer Using Convolutional Neural Networks](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf)
+with additional features.
 
 <p float="left">
     <img src="examples/Tuebingen_Neckarfront.jpeg" width="240" height="160"/>

@@ -4,8 +4,9 @@ import torch
 
 
 from . import models
+from .models import total_variation_loss
 from . import utils
-from torch.optim import LBFGS
+from torch.optim import LBFGS, AdamW
 from typing import Tuple
 from tqdm import tqdm
 
@@ -14,6 +15,7 @@ def run_style_transfer(
     model: models.StyleTransferNet,
     alpha: float = 1.0,
     beta: float = 1.0e6,
+    reg: float = 1.0e-6,
     iters: int = 300,
     lr: float = 1.0,
     display_freq: int = 10,
@@ -29,6 +31,7 @@ def run_style_transfer(
     ).requires_grad_(True)
 
     optimizer = LBFGS([generated_image], lr=lr, max_iter=10)
+    # optimizer = AdamW([generated_image], lr=0.1)
     content_losses, style_losses = [], []
     best_image = generated_image.clone().detach()
     best_loss = float("inf")
@@ -50,11 +53,12 @@ def run_style_transfer(
                     style_loss = torch.stack(
                         [layer.loss for layer in style_layers]
                     ).sum()
+                    tv_loss = reg * total_variation_loss(generated_image)
 
                     content_losses.append(content_loss)
                     style_losses.append(style_loss)
 
-                    loss = alpha * content_loss + beta * style_loss
+                    loss = alpha * content_loss + beta * style_loss + tv_loss
                     loss.backward()
                     return loss.item()
 

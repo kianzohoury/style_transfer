@@ -138,6 +138,10 @@ def style_loss(
 
 def total_variation_loss(feature_maps: torch.Tensor) -> torch.Tensor:
     """Returns the total variation loss of the input features."""
-    loss = feature_maps[:, ..., :-1] + feature_maps[:, ..., 1:]
-    loss += feature_maps[:, ..., :-1, :] + feature_maps[:, ..., 1:, :]
+    loss = torch.sum(
+        feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:] ** 2
+    )
+    loss += torch.sum(
+        feature_maps[:, :, :-1, :] + feature_maps[:, :, 1:, :] ** 2
+    )
     return loss
