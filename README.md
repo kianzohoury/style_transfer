@@ -14,6 +14,11 @@ with additional features.
     <img src="examples/great_wave.jpg" width="240" height="160"/>
 </p>
 
+## Background
+Style transfer is the process of using neural networks to transform images
+into new images of a different style while still resembling the content of the
+original image.
+
 ## Install
 Clone the repo to install:
 ```
