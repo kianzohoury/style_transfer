@@ -118,9 +118,8 @@ def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
 
 
 def content_loss(
-        generated_features: torch.Tensor,
-        target_features: torch.Tensor,
-        reg: float = 1e-8
+    generated_features: torch.Tensor,
+    target_features: torch.Tensor
 ) -> torch.Tensor:
     """Returns the content loss given the generated and target features."""
     loss = nn.functional.mse_loss(generated_features, target_features)
@@ -128,8 +127,8 @@ def content_loss(
 
 
 def style_loss(
-        generated_features: torch.Tensor,
-        target_features: torch.Tensor
+    generated_features: torch.Tensor,
+    target_features: torch.Tensor
 ) -> torch.Tensor:
     """Returns the style loss given the generated and target features."""
     generated_gram = gram_matrix(generated_features)
@@ -140,6 +139,10 @@ def style_loss(
 
 def total_variation_loss(feature_maps: torch.Tensor) -> torch.Tensor:
     """Returns the total variation loss of the input features."""
-    loss = ((feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:]) ** 2).sum()
-    loss += (feature_maps[:, :, :-1, :] + feature_maps[:, :, 1:, :] ** 2).sum()
+    loss = torch.sum(
+        feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:] ** 2
+    )
+    loss += torch.sum(
+        feature_maps[:, :, :-1, :] + feature_maps[:, :, 1:, :] ** 2
+    )
     return loss

@@ -14,3 +14,9 @@ with additional features.
     <img src="examples/great_wave.jpg" width="120" height="80"/>
 </p>
 
+## Install
+Clone the repo.
+``
+https://github.com/kianzohoury/style_transfer.git
+``
+
