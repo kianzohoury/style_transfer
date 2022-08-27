@@ -12,16 +12,16 @@ from tqdm import tqdm
 
 
 def run_style_transfer(
-    model: models.StyleTransferNet,
-    alpha: float = 1.0,
-    beta: float = 1.0e6,
-    reg: float = 1.0e-6,
-    iters: int = 300,
-    lr: float = 1.0,
-    display_freq: int = 10,
-    dpi: int = 120,
-    figsize: Tuple[int] = (4, 4),
-    device: str = "cpu"
+        model: models.StyleTransferNet,
+        alpha: float = 1.0,
+        beta: float = 1.0e6,
+        reg: float = 1.0e-6,
+        iters: int = 300,
+        lr: float = 1.0,
+        display_freq: int = 10,
+        dpi: int = 120,
+        figsize: Tuple[int] = (4, 4),
+        device: str = "cpu"
 ) -> torch.Tensor:
     """Runs style transfer."""
 
@@ -43,16 +43,16 @@ def run_style_transfer(
             for i, _ in enumerate(tq):
                 def closure():
                     with torch.no_grad():
-                        generated_image.clamp_(0, 1)
+                        generated_image.clamp_(-1.5, 1.5)
                     optimizer.zero_grad()
 
                     content_layers, style_layers = model(generated_image)
                     content_loss = torch.stack(
                         [layer.loss for layer in content_layers]
                     ).sum()
-                    style_loss = torch.stack(
-                        [layer.loss for layer in style_layers]
-                    ).sum()
+                    style_loss = 0
+                    for i in range(len(style_layers)):
+                        style_loss += style_layers[i].loss
                     tv_loss = reg * total_variation_loss(generated_image)
 
                     content_losses.append(content_loss)
