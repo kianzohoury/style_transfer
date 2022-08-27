@@ -11,15 +11,15 @@ from tqdm import tqdm
 
 
 def run_style_transfer(
-        model: models.StyleTransferNet,
-        alpha: float = 1.0,
-        beta: float = 1.0e6,
-        iters: int = 300,
-        lr: float = 1.0,
-        display_freq: int = 10,
-        dpi: int = 120,
-        figsize: Tuple[int] = (4, 4),
-        device: str = "cpu"
+    model: models.StyleTransferNet,
+    alpha: float = 1.0,
+    beta: float = 1.0e6,
+    iters: int = 300,
+    lr: float = 1.0,
+    display_freq: int = 10,
+    dpi: int = 120,
+    figsize: Tuple[int] = (4, 4),
+    device: str = "cpu"
 ) -> torch.Tensor:
     """Runs style transfer."""
 
@@ -70,6 +70,7 @@ def run_style_transfer(
                 if curr_loss < best_loss:
                     best_loss = curr_loss
                     best_image = generated_image.detach().clone()
+
             utils.display_image(
                 generated_image,
                 title="Generated Image",
