@@ -59,9 +59,6 @@ def run_style_transfer(
                     return loss.item()
 
                 curr_loss = optimizer.step(closure)
-                if curr_loss < best_loss:
-                    best_loss = curr_loss
-                    best_image = generated_image.detach().clone()
                 tq.set_postfix(
                     {
                         "Content Loss": f"{content_losses[-1]:.12f}",
@@ -70,6 +67,9 @@ def run_style_transfer(
                 )
                 with torch.no_grad():
                     generated_image.clamp_(0, 1)
+                if curr_loss < best_loss:
+                    best_loss = curr_loss
+                    best_image = generated_image.detach().clone()
             utils.display_image(
                 generated_image,
                 title="Generated Image",
