@@ -15,8 +15,8 @@ with additional features.
 </p>
 
 ## Install
-Clone the repo.
-``
+Clone the repo to install:
+```
 https://github.com/kianzohoury/style_transfer.git
-``
+```
 
