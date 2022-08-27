@@ -22,7 +22,7 @@ https://github.com/kianzohoury/style_transfer.git
 
 ## Usage
 ```
-style_transfer path/to/content_img path/to/style_img
+python3 style_transfer path/to/content_img path/to/style_img
 --save path/to/output \
 --iters 300 \
 --beta 0.0001 \
