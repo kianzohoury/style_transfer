@@ -35,14 +35,14 @@ class LossLayer(nn.Module):
 
 class StyleTransferNet(nn.Module):
     def __init__(
-            self,
-            model: nn.Module,
-            content_image: torch.Tensor,
-            style_image: torch.Tensor,
-            content_labels: List[str],
-            style_labels: List[str],
-            mean: List[float],
-            std: List[float]
+        self,
+        model: nn.Module,
+        content_image: torch.Tensor,
+        style_image: torch.Tensor,
+        content_labels: List[str],
+        style_labels: List[str],
+        mean: List[float],
+        std: List[float]
     ):
         super(StyleTransferNet, self).__init__()
         self.input_size = content_image.size()
@@ -118,7 +118,7 @@ def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
 
 
 def content_loss(
-        generated_features: torch.Tensor, target_features: torch.Tensor
+    generated_features: torch.Tensor, target_features: torch.Tensor
 ) -> torch.Tensor:
     """Returns the content loss given the generated and target features."""
     loss = nn.functional.mse_loss(generated_features, target_features)
@@ -126,11 +126,18 @@ def content_loss(
 
 
 def style_loss(
-        generated_features: torch.Tensor,
-        target_features: torch.Tensor
+    generated_features: torch.Tensor,
+    target_features: torch.Tensor
 ) -> torch.Tensor:
     """Returns the style loss given the generated and target features."""
     generated_gram = gram_matrix(generated_features)
     target_gram = gram_matrix(target_features)
     loss = nn.functional.mse_loss(generated_gram, target_gram)
+    return loss
+
+
+def total_variation_loss(feature_maps: torch.Tensor) -> torch.Tensor:
+    """Returns the total variation loss of the input features."""
+    loss = feature_maps[:, ..., :-1] + feature_maps[:, ..., 1:]
+    loss += feature_maps[:, ..., :-1, :] + feature_maps[:, ..., 1:, :]
     return loss
