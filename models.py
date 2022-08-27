@@ -3,15 +3,15 @@
 import torch
 import torch.nn as nn
 
-from typing import Callable, List, Tuple
+from typing import Callable, List
 
 
 class InputNorm(nn.Module):
     """Normalizes input given the mean and std."""
-    def __init__(self, mean: List[float], std: List[float]):
+    def __init__(self, mean: List[float], std: List[float], device: str):
         super(InputNorm, self).__init__()
-        self.mean = nn.Parameter(torch.Tensor(mean).view(-1, 1, 1))
-        self.std = nn.Parameter(torch.Tensor(std).view(-1, 1, 1))
+        self.mean = nn.Parameter(torch.Tensor(mean).view(-1, 1, 1).to(device))
+        self.std = nn.Parameter(torch.Tensor(std).view(-1, 1, 1).to(device))
 
     def forward(self, image: torch.Tensor) -> torch.Tensor:
         normalized = (image - self.mean) / self.std
@@ -35,21 +35,21 @@ class LossLayer(nn.Module):
 
 class StyleTransferNet(nn.Module):
     def __init__(
-            self,
-            model: nn.Module,
-            content_image: torch.Tensor,
-            style_image: torch.Tensor,
-            content_labels: List[str],
-            style_labels: List[str],
-            mean: List[float],
-            std: List[float]
+        self,
+        model: nn.Module,
+        content_image: torch.Tensor,
+        style_image: torch.Tensor,
+        content_labels: List[str],
+        style_labels: List[str],
+        mean: List[float],
+        std: List[float]
     ):
         super(StyleTransferNet, self).__init__()
         self.input_size = content_image.size()
         self.network = nn.Sequential()
         self.network.add_module(
             "input_norm",
-            InputNorm(mean=mean, std=std).to(content_image.device)
+            InputNorm(mean=mean, std=std, device=content_image.device)
         )
         self.content_layers = []
         self.style_layers = []
@@ -114,13 +114,18 @@ def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
     return gram / (n * c * h * w)
 
 
-def content_loss(generated_features, target_features):
+def content_loss(
+    generated_features: torch.Tensor, target_features: torch.Tensor
+) -> torch.Tensor:
     """Returns the content loss given the generated and target features."""
     loss = nn.functional.mse_loss(generated_features, target_features)
     return loss
 
 
-def style_loss(generated_features, target_features):
+def style_loss(
+    generated_features: torch.Tensor,
+    target_features: torch.Tensor
+) -> torch.Tensor:
     """Returns the style loss given the generated and target features."""
     generated_gram = gram_matrix(generated_features)
     target_gram = gram_matrix(target_features)
