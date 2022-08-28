@@ -80,10 +80,10 @@ def run_style_transfer(
 
                     # Calculate perceptual loss.
                     c_loss = s_loss = 0
-                    for l in range(len(content_layers)):
-                        c_loss += alpha * content_layers[l].loss
-                    for l in range(len(style_layers)):
-                        s_loss += beta * style_layers[i].loss
+                    for layer_i in range(len(content_layers)):
+                        c_loss += alpha * content_layers[layer_i].loss
+                    for layer_i in range(len(style_layers)):
+                        s_loss += beta * style_layers[layer_i].loss
                     content_losses.append(c_loss)
                     style_losses.append(s_loss)
 
