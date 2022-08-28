@@ -45,7 +45,7 @@ def run_gatys_style_transfer(
 
     # Load model and create loss network.
     loss_network = models.LossNet(
-        model=torchvision.models.vgg19(pretrained=True).to(device).eval(),
+        model=torchvision.models.vgg19(pretrained=True).features.eval(),
         content_image=content_image,
         style_image=style_image,
         content_labels=content_labels or GATYS_CONTENT_DEFAULT,
@@ -53,7 +53,7 @@ def run_gatys_style_transfer(
         mean=[0.485, 0.456, 0.406] if normalize_input else [0, 0, 0],
         std=[0.229, 0.224, 0.225] if normalize_input else [1.0, 1.0, 1.0]
     )
-    loss_network = loss_network.requires_grad_(False).eval()
+    loss_network = loss_network.to(device).requires_grad_(False).eval()
 
     # Initialize image, load optimizer.
     generated_image = torch.randn(
