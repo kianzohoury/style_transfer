@@ -55,16 +55,23 @@ def run_gatys_style_transfer(
     )
     loss_network = loss_network.requires_grad_(False).eval()
 
-    # Initialize image, load optimizer.
-    generated_image = torch.randn(
-        content_image.size(), device=device
-    ).requires_grad_(True)
+    # Initialize image.
+    if kwargs.get("random", True):
+        generated_image = torch.randn(
+            content_image.size(), device=device
+        ).requires_grad_(True)
+    else:
+        generated_image = content_image.clone().requires_grad_(True)
+
+    # Load optimizer.
     optimizer = LBFGS([generated_image], lr=lr, max_iter=10)
 
     content_losses, style_losses = [], []
     best_image, best_loss = None, float("inf")
     display_freq = kwargs.get("display_freq", num_iters // 10)
     epochs = num_iters // display_freq
+
+    betas = [beta * 1e-3, beta * 1e-2, beta * 1e-1, beta]
 
     print("Starting style transfer...")
     for epoch in range(epochs):
@@ -83,12 +90,22 @@ def run_gatys_style_transfer(
                         generated_image
                     )
 
+                    if epoch < 3:
+                        beta = betas[0]
+                    elif epoch < 6:
+                        beta = betas[1]
+                    elif epoch < 9:
+                        beta = betas[2]
+                    else:
+                        beta = betas[-1]
+
                     # Calculate perceptual loss.
                     c_loss = s_loss = 0
                     for layer_i in range(len(content_layers)):
                         c_loss += alpha * content_layers[layer_i].loss
                     for layer_j in range(len(style_layers)):
                         s_loss += beta * style_layers[layer_j].loss
+
                     content_losses.append(c_loss)
                     style_losses.append(s_loss)
 
@@ -118,6 +135,7 @@ def run_gatys_style_transfer(
                 utils.display_image(
                     img=generated_image, title="Generated Image"
                 )
+            utils.tensor_to_image(generated_image).save(fp=f"{epoch}_{save_path}")
     print("Style transfer is complete.")
     # Save image.
     if save_path is not None:
