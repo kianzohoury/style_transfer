@@ -26,6 +26,22 @@ $ git clone https://github.com/kianzohoury/style_transfer.git
 ```
 
 ## Usage
+
+```python
+from style_transfer import run_gatys_style_transfer
+
+output = run_gatys_style_transfer(
+    content_src="henriette_mayer_van_den_bergh.jpeg",
+    style_src="wassily_kandinsky_composition_VII.jpeg",
+    save_path="my_style_transfer.jpg",
+    image_size=(768, 640),
+    num_iters=100,
+    tv_reg=1e-3,
+    device="cuda"
+)
+```
+
+
 ```
 $ python3 style_transfer path/to/content_img path/to/style_img
 --save path/to/output \
