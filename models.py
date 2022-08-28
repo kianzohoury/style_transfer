@@ -33,8 +33,8 @@ class LossLayer(nn.Module):
         return generated_features
 
 
-class StyleTransferNet(nn.Module):
-    """Wrapper class that creates additional layers for retrieving losses."""
+class LossNet(nn.Module):
+    """Network that computes the content and style losses."""
     def __init__(
         self,
         model: nn.Module,
@@ -45,8 +45,7 @@ class StyleTransferNet(nn.Module):
         mean: List[float],
         std: List[float]
     ):
-        super(StyleTransferNet, self).__init__()
-        self.input_size = content_image.size()
+        super(LossNet, self).__init__()
         self.network = nn.Sequential()
         self.network.add_module(
             "input_norm",
@@ -140,10 +139,10 @@ def style_loss(
 
 def total_variation_loss(feature_maps: torch.Tensor) -> torch.Tensor:
     """Returns the total variation loss of the input features."""
-    loss = torch.sum(
-        feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:] ** 2
+    loss = torch.mean(
+        (feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:]) ** 2
     )
-    loss += torch.sum(
-        feature_maps[:, :, :-1, :] + feature_maps[:, :, 1:, :] ** 2
+    loss += torch.mean(
+        (feature_maps[:, :, :-1, :] + feature_maps[:, :, 1:, :]) ** 2
     )
     return loss

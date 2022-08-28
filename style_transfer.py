@@ -8,20 +8,23 @@ import torchvision
 from . import models
 from .models import total_variation_loss
 from . import utils
-from torch.optim import LBFGS, AdamW
-from typing import List, Tuple
+from torch.optim import LBFGS
+from typing import List, Optional, Tuple
 from tqdm import tqdm
 
+# Default content and style loss layers.
+GATYS_CONTENT_DEFAULT = ["conv_4_2"]
+GATYS_STYLE_DEFAULT = ["conv_1_1", "conv_2_1", "conv_3_1", "conv_4_1"]
 
-def run_style_transfer(
-    network: nn.Module,
-    input_mean: List[float],
-    input_std: List[float],
+
+def run_gatys_style_transfer(
     content_src: str,
     style_src: str,
-    image_size: List[int],
-    content_labels: List[str],
-    style_labels: List[str],
+    save_path: Optional[str] = None,
+    image_size: Tuple[int, int] = (512, 512),
+    content_labels: Optional[List[str]] = None,
+    style_labels: Optional[List[str]] = None,
+    normalize_input: bool = True,
     alpha: float = 1.0,
     beta: float = 1.0e6,
     num_iters: int = 300,
@@ -30,31 +33,31 @@ def run_style_transfer(
     device: str = "cpu",
     **kwargs
 ) -> torch.Tensor:
-    """Runs style transfer."""
+    """Runs style transfer and returns the resulting image."""
 
     # Load images.
     content_image = utils.load_image(
-        filepath=content_src, size=image_size, device=device
+        filepath=content_src, size=list(image_size), device=device
     )
     style_image = utils.load_image(
-        filepath=style_src, size=image_size, device=device
+        filepath=style_src, size=list(image_size), device=device
     )
 
-    # Load model.
-    model = models.StyleTransferNet(
-        model=network.to(device).eval(),
+    # Load model and create loss network.
+    loss_network = models.LossNet(
+        model=torchvision.models.vgg19(pretrained=True).to(device).eval(),
         content_image=content_image,
         style_image=style_image,
-        content_labels=content_labels,
-        style_labels=style_labels,
-        mean=input_mean,
-        std=input_std
+        content_labels=content_labels or GATYS_CONTENT_DEFAULT,
+        style_labels=style_labels or GATYS_STYLE_DEFAULT,
+        mean=[0.485, 0.456, 0.406] if normalize_input else [0, 0, 0],
+        std=[0.229, 0.224, 0.225] if normalize_input else [1.0, 1.0, 1.0]
     )
-    model = model.requires_grad_(False).eval()
+    loss_network = loss_network.requires_grad_(False).eval()
 
     # Initialize image, load optimizer.
     generated_image = torch.randn(
-        model.input_size, device=device
+        content_image.size(), device=device
     ).requires_grad_(True)
     optimizer = LBFGS([generated_image], lr=lr, max_iter=10)
 
@@ -76,7 +79,9 @@ def run_style_transfer(
                     optimizer.zero_grad()
 
                     # Retrieve content and style layers.
-                    content_layers, style_layers = model(generated_image)
+                    content_layers, style_layers = loss_network(
+                        generated_image
+                    )
 
                     # Calculate perceptual loss.
                     c_loss = s_loss = 0
@@ -113,4 +118,9 @@ def run_style_transfer(
                 utils.display_image(
                     img=generated_image, title="Generated Image"
                 )
+    print("Style transfer is complete.")
+    # Save image.
+    if save_path is not None:
+        utils.tensor_to_image(best_image).save(fp=save_path)
+        print(f"Saved output to {save_path}.")
     return best_image
