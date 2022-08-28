@@ -109,7 +109,7 @@ def run_style_transfer(
                     best_image = generated_image.detach().clone()
 
             # Display generated image so far.
-            if not kwargs.get("display", True):
+            if kwargs.get("display", True):
                 utils.display_image(
                     img=generated_image, title="Generated Image"
                 )
