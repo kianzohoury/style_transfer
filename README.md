@@ -46,7 +46,7 @@ $ python3 style_transfer gatys
 --beta 100000 \
 --lr 1.0 \
 --tv-reg 0.00001 \
---device cuda
+--device cuda \
 --random
 ```
 
