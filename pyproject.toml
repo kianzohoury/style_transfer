@@ -1,0 +1,23 @@
+[build-system]
+requires = [
+    "flit_core >=3.2,<4",
+]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "style_transfer"
+authors = [
+    {name = "Kian Zohoury", email = "kzohoury@berkeley.edu"}
+]
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+
+dependencies = [
+    "torch==1.12.1",
+    "torchvision==0.13.1",
+    "Pillow==7.1.2",
+    "matplotlib==3.2.2",
+    "tqdm==4.64.0"
+]
