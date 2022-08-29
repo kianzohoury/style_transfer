@@ -37,7 +37,7 @@ To run style transfer using the method outlined by Gatys et. al, execute the
 following:
 
 ```
-$ python3 style_transfer gatys \
+$ python3 style_transfer -m gatys \
 --content path/to/content_img \
 --style path/to/style_img \
 --save path/to/output \
