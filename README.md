@@ -32,29 +32,44 @@ $ git clone https://github.com/kianzohoury/style_transfer.git
 ```
 
 ## Usage
+### Gatys Method
+To run style transfer using the method outlined by Gatys et. al, execute the
+following:
+
+```
+$ python3 style_transfer gatys 
+--content path/to/content_img \
+--style path/to/style_img \
+--save path/to/output \
+--iters 100 \
+--alpha 1.0 \
+--beta 100000 \
+--lr 1.0 \
+--tv-reg 0.00001 \
+--device cuda
+--random
+```
+
+Optionally, the same can be achieved by calling the corresponding function
+within a python script or notebook.
 
 ```python
 from style_transfer import run_gatys_style_transfer
 
-output = run_gatys_style_transfer(
+generated_image = run_gatys_style_transfer(
     content_src="henriette_mayer_van_den_bergh.jpeg",
     style_src="wassily_kandinsky_composition_VII.jpeg",
     save_path="my_style_transfer.jpg",
     image_size=(768, 640),
     num_iters=100,
-    tv_reg=1e-3,
-    device="cuda"
+    alpha=1.0,
+    beta=100000,
+    lr=1.0,
+    tv_reg=1e-5,
+    device="cuda",
+    random=True
 )
 ```
 
 
-```
-$ python3 style_transfer path/to/content_img path/to/style_img
---save path/to/output \
---iters 300 \
---beta 0.0001 \
---lr 1.0 \
---tv-reg \
---device cuda
-```
 
