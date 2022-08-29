@@ -11,27 +11,27 @@ from . import utils
 from torch.optim import LBFGS
 from typing import List, Optional, Tuple
 from tqdm import tqdm
-
+import math
 # Default content and style loss layers.
 GATYS_CONTENT_DEFAULT = ["conv_4_2"]
 GATYS_STYLE_DEFAULT = ["conv_1_1", "conv_2_1", "conv_3_1", "conv_4_1"]
 
 
 def run_gatys_style_transfer(
-    content_src: str,
-    style_src: str,
-    save_path: Optional[str] = None,
-    image_size: Tuple[int, int] = (512, 512),
-    content_labels: Optional[List[str]] = None,
-    style_labels: Optional[List[str]] = None,
-    normalize_input: bool = True,
-    alpha: float = 1.0,
-    beta: float = 1.0e6,
-    num_iters: int = 300,
-    lr: float = 1.0,
-    tv_reg: float = 1.0e-6,
-    device: str = "cpu",
-    **kwargs
+        content_src: str,
+        style_src: str,
+        save_path: Optional[str] = None,
+        image_size: Tuple[int, int] = (512, 512),
+        content_labels: Optional[List[str]] = None,
+        style_labels: Optional[List[str]] = None,
+        normalize_input: bool = True,
+        alpha: float = 1.0,
+        beta: float = 1.0e6,
+        num_iters: int = 300,
+        lr: float = 1.0,
+        tv_reg: float = 1.0e-6,
+        device: str = "cpu",
+        **kwargs
 ) -> torch.Tensor:
     """Runs style transfer and returns the resulting image."""
 
@@ -71,8 +71,6 @@ def run_gatys_style_transfer(
     display_freq = kwargs.get("display_freq", num_iters // 10)
     epochs = num_iters // display_freq
 
-    betas = [beta * 1e-3, beta * 1e-2, beta * 1e-1, beta]
-
     print("Starting style transfer...")
     for epoch in range(epochs):
         with tqdm(range(display_freq)) as tq:
@@ -90,15 +88,6 @@ def run_gatys_style_transfer(
                         generated_image
                     )
 
-                    if epoch < 3:
-                        beta = betas[0]
-                    elif epoch < 6:
-                        beta = betas[1]
-                    elif epoch < 9:
-                        beta = betas[2]
-                    else:
-                        beta = betas[-1]
-
                     # Calculate perceptual loss.
                     c_loss = s_loss = 0
                     for layer_i in range(len(content_layers)):
@@ -106,6 +95,7 @@ def run_gatys_style_transfer(
                     for layer_j in range(len(style_layers)):
                         s_loss += beta * style_layers[layer_j].loss
 
+                    # s_loss *= math.exp(epoch / epochs) * s_loss
                     content_losses.append(c_loss)
                     style_losses.append(s_loss)
 
@@ -141,4 +131,5 @@ def run_gatys_style_transfer(
     if save_path is not None:
         utils.tensor_to_image(best_image).save(fp=save_path)
         print(f"Saved output to {save_path}.")
+    del optimizer
     return best_image
