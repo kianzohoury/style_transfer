@@ -32,7 +32,7 @@ $ git clone https://github.com/kianzohoury/style_transfer.git
 ```
 
 ## Usage
-### Gatys Method
+### Gatys et al. Method
 To run style transfer using the method outlined by Gatys et. al, execute the
 following:
 
@@ -71,5 +71,7 @@ generated_image = run_gatys_style_transfer(
 )
 ```
 
+### Johnson et al. Method
+TODO
 
 
