@@ -1,6 +1,9 @@
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing)
+
 # Neural Style Transfer
-A PyTorch implementation of [Image Style Transfer Using Convolutional Neural Networks](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf)
-with additional features.
+A PyTorch implementation of two original works in Neural Style Transfer:
+* Image Style Transfer Using Convolutional Neural Networks ([Gatys et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf))
+* Perceptual Losses for Real-Time Style Transfer and Super-Resolution ([Johnson et. al](https://arxiv.org/pdf/1603.08155.pdf))
 
 <p float="left" style="margin: 0 auto;">
     <img src="examples/content/tuebingen_neckarfront.jpeg" width="240" height="160"/>
@@ -15,9 +18,12 @@ with additional features.
 </p>
 
 ## Background
-Style transfer is the process of using neural networks to transform images
-into new images of a different style while still resembling the content of the
-original image.
+Style transfer is the task of generating an image that resembles the content
+information of one image while sharing the style or _look_ of another image.
+Unlike other well defined image tasks, the objective with style transfer is to
+find an acceptable tradeoff between the _content representation_ and
+_style representation_ of the image that leads to visually aesthetic results.
+With CNNs, the feature maps of the generated image can be compared against
 
 ## Install
 Clone the repo to install:
