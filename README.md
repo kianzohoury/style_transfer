@@ -74,4 +74,7 @@ generated_image = run_gatys_style_transfer(
 ### Johnson et al. Method
 TODO
 
+## Colab Notebook
+An interactive notebook can be accessed [here](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing).       
+     
 
