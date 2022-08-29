@@ -1,7 +1,6 @@
-
-
 import torch
 import torch.nn as nn
+
 
 from typing import Callable, List
 
@@ -51,11 +50,9 @@ class LossNet(nn.Module):
             "input_norm",
             InputNorm(mean=mean, std=std).to(content_image.device)
         )
-        self.content_layers = []
-        self.style_layers = []
 
-        i = 1
-        j = 0
+        self.content_layers, self.style_layers = [], []
+        i, j = 1, 0
 
         for layer in list(model.children()):
             layer.requires_grad = False

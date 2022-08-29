@@ -1,5 +1,3 @@
-
-
 import torch
 import torchvision.transforms.functional as TF
 import matplotlib.pyplot as plt
@@ -32,7 +30,7 @@ def display_image(
     title: str,
     figsize: Tuple[int] = (6, 6),
     dpi=200
-):
+) -> None:
     """Displays an image with a title."""
     img = tensor_to_image(img) if isinstance(img, torch.Tensor) else img
     plt.figure(figsize=figsize, dpi=dpi)

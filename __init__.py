@@ -1,5 +1,3 @@
-
-
 __all__ = [
     "models", "style_transfer", "utils", "run_gatys_style_transfer"
 ]
