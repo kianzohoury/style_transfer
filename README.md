@@ -61,9 +61,31 @@ $ python3 style_transfer -m gatys \
 --beta 100000 \
 --lr 1.0 \
 --tv-reg 0.00001 \
---device cuda \
---random
+--random \
+--device cuda
 ```
+
+### Options
+
+**--content** (str): path to the content image
+
+**--style** (str): path to the style image
+
+**--save** (str): path to save the generated image
+
+**--iters** (int): number of optimization steps or updates to the image
+
+**--alpha** (float): content loss weight
+
+**--beta** (float): style loss weight
+
+**--lr** (float): learning rate for LBFGS optimizer
+
+**--tv-reg** (float): total variation regularization weight
+
+**--random** (flag): initializes the image from noise
+
+**--device** (str): device
 
 Optionally, the same can be achieved by calling the corresponding function
 within a python script or notebook.
