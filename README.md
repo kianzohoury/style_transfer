@@ -10,8 +10,8 @@ stylized images produced from transformation networks.
 
 
 <p align="center" style="margin: 0 auto;">                                                    
-    <img src="examples/content/tuebingen_neckarfront.jpeg" width=480 height=320/>         
-    <img src="examples/transfers/starry_night.jpg" width=480 height=320/>                                    
+    <img src="examples/content/tuebingen_neckarfront.jpeg" width=48% height=250/>         
+    <img src="examples/transfers/starry_night.jpg" width=48% height=250/>                                    
 </p>       
 <p align="center" style="margin: 0 auto;">   
     <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>
