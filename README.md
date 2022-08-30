@@ -37,7 +37,7 @@ Clone the repo to install:
 ```                                                            
 $ git clone https://github.com/kianzohoury/style_transfer.git  
 ```                                                            
-And install the dependencies with the PyPi package manager:
+and install the dependencies with the PyPi package manager:
 ```
 $ pip install .
 ```
