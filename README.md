@@ -14,7 +14,7 @@ stylized images produced from transformation networks.
     <figure> 
         <figcaption>
             Photo of <i>Tuebingen Neckarfront</i> by Andreas Praefcke (left) and a
-            version in the style of <i>Starry Night</i> by Van Gogh (right).
+            version generated in the style of <i>Starry Night</i> by Van Gogh (right).
         </figcaption>
     </figure> 
 </div>
