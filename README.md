@@ -8,17 +8,19 @@ A PyTorch implementation of two original works in Neural Style Transfer:
 with additional modifications to the second method to improve the quality of
 stylized images produced from transformation networks.
 
-<p float="left" style="margin: 0 auto;">
+<center>
+<p style="margin: 0 auto;">
     <img src="examples/content/tuebingen_neckarfront.jpeg" width="240" height="160"/>
     <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>
     <img src="examples/transfers/shipwreck.jpg" width="240" height="160"/>
 </p>
 
-<p float="left" style="margin: 0 auto;">
+<p style="margin: 0 auto">
     <img src="examples/transfers/scream.jpg" width="240" height="160"/>
     <img src="examples/transfers/picasso.jpg" width="240" height="160"/>
     <img src="examples/transfers/great_wave.jpg" width="240" height="160"/>
 </p>
+</center>       
 
 ## Background
 Style transfer is the task of generating an image that resembles the content
