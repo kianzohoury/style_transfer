@@ -65,7 +65,7 @@ $ python3 style_transfer -m gatys \
 --device cuda
 ```
 
-### Options
+#### Options
 
 `--content` (str): path to the content image
 
