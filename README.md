@@ -62,11 +62,11 @@ To run style transfer using the method outlined by Gatys et. al, execute the
 following:
 
 ```
-$ python3 style_transfer -m gatys \
---content path/to/content_img \
---style path/to/style_img \
---save path/to/output \
---iters 100 \
+$ python3 -m style_transfer gatys \
+--content-src path/to/content_img \
+--style-src path/to/style_img \
+--save-path path/to/output \
+--num-iters 100 \
 --alpha 1.0 \
 --beta 100000 \
 --lr 1.0 \

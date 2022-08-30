@@ -1,13 +1,13 @@
+
 import torch
 import torchvision
 
 
-from . import models
-from .models import total_variation_loss
-from . import utils
+from .models import LossNet, total_variation_loss
 from torch.optim import LBFGS
-from typing import List, Optional, Tuple
 from tqdm import tqdm
+from typing import List, Optional, Tuple
+from .utils import display_image, load_image, tensor_to_image
 
 # Default content and style loss layers.
 GATYS_CONTENT_DEFAULT = ["conv_4_2"]
@@ -24,24 +24,52 @@ def run_gatys_style_transfer(
     normalize_input: bool = True,
     alpha: float = 1.0,
     beta: float = 1.0e6,
-    num_iters: int = 300,
+    num_iters: int = 100,
     lr: float = 1.0,
     tv_reg: float = 1.0e-6,
     device: str = "cpu",
+    random: bool = False,
     **kwargs
 ) -> torch.Tensor:
-    """Runs style transfer and returns the resulting image."""
+    """Runs style transfer and returns the resulting image.
+
+    Args:
+        content_src (str): Path to content image.
+        style_src (str): Path to style image.
+        save_path (Optional[str]): Path to save generated image to.
+            Default: None.
+        image_size (Tuple[int, int]): Shape to resize images.
+            Default: (512, 512).
+        content_labels (Optional[List[str]]): Layers to calculate content
+            losses from. If None is specified, it defaults to conv_4_2.
+            Default: None.
+        style_labels (Optional[List[str]]): Layers to calculate style losses
+            from. If None is specified, it defaults to conv_1_1 through
+            conv_4_1.
+        normalize_input (bool): Normalizes input using statistics for VGG19.
+            Default: True.
+        alpha (float): Content loss weight. Default: 1.0.
+        beta (float): Style loss weight. Default: 1.0e6.
+        num_iters (int): Number of image optimizations. Default: 100.
+        lr (float): Learning rate for LBFGS optimizer. Default: 1.0.
+        tv_reg (float): Total variation regularization weight. Default: 1.0e-6.
+        device (str): Device. Default: 'cpu'.
+        random (bool): Initializes generated image with noise. Default: True.
+
+    Returns:
+        Tensor: Generated image.
+    """
 
     # Load images.
-    content_image = utils.load_image(
+    content_image = load_image(
         filepath=content_src, size=list(image_size), device=device
     )
-    style_image = utils.load_image(
+    style_image = load_image(
         filepath=style_src, size=list(image_size), device=device
     )
 
     # Load model and create loss network.
-    loss_network = models.LossNet(
+    loss_network = LossNet(
         model=torchvision.models.vgg19(pretrained=True).features.to(device),
         content_image=content_image,
         style_image=style_image,
@@ -53,7 +81,7 @@ def run_gatys_style_transfer(
     loss_network = loss_network.requires_grad_(False).eval()
 
     # Initialize image.
-    if kwargs.get("random", True):
+    if random:
         generated_image = torch.randn(
             content_image.size(), device=device
         ).requires_grad_(True)
@@ -118,13 +146,13 @@ def run_gatys_style_transfer(
 
             # Display generated image so far.
             if kwargs.get("display", True):
-                utils.display_image(
+                display_image(
                     img=generated_image, title="Generated Image"
                 )
-            utils.tensor_to_image(generated_image).save(f"{epoch}_{save_path}")
+            tensor_to_image(generated_image).save(f"{epoch}_{save_path}")
     print("Style transfer is complete.")
     # Save image.
     if save_path is not None:
-        utils.tensor_to_image(best_image).save(fp=save_path)
+        tensor_to_image(best_image).save(fp=save_path)
         print(f"Saved output to {save_path}.")
     return best_image
