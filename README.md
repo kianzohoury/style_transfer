@@ -67,25 +67,25 @@ $ python3 style_transfer -m gatys \
 
 ### Options
 
-**--content** (str): path to the content image
+`--content` (str): path to the content image
 
-**--style** (str): path to the style image
+`--style` (str): path to the style image
 
-**--save** (str): path to save the generated image
+`--save` (str): path to save the generated image
 
-**--iters** (int): number of optimization steps or updates to the image
+`--iters` (int): number of optimization steps or updates to the image
 
-**--alpha** (float): content loss weight
+`--alpha` (float): content loss weight
 
-**--beta** (float): style loss weight
+`--beta` (float): style loss weight
 
-**--lr** (float): learning rate for LBFGS optimizer
+`--lr` (float): learning rate for LBFGS optimizer
 
-**--tv-reg** (float): total variation regularization weight
+`--tv-reg` (float): total variation regularization weight
 
-**--random** (flag): initializes the image from noise
+`--random` (flag): initializes the image from noise
 
-**--device** (str): device
+`--device` (str): device
 
 Optionally, the same can be achieved by calling the corresponding function
 within a python script or notebook.
