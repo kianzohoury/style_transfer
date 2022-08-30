@@ -40,6 +40,11 @@ the optimization is on the generated image directly, whereas in the second metho
 a separate transformation network is trained to produce images directly. In fact,
 once trained, the latter method is much faster (~1000x).
 
+## Additions
+- [ ] Finish facial preservation mechanism (MTCNN, additional loss term).
+- [ ] Finish color preservation (luminance transfer)     
+- [ ] Finish training transformation network on COCO for method 2.
+
 ## Requirements
 * PyTorch
 * Torchvision
@@ -119,7 +124,7 @@ generated_image = run_gatys_style_transfer(
 ```
 
 ### Johnson et al. Method
-TODO
+- [ ] TODO
 
 ## Colab Notebook
 An interactive notebook can be accessed [here](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing).       
