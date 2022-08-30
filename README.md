@@ -40,12 +40,6 @@ the optimization is on the generated image directly, whereas in the second metho
 a separate transformation network is trained to produce images directly. In fact,
 once trained, the latter method is much faster (~1000x).
 
-
-
-is used to produce feature maps of the 
-With CNNs, the feature maps of the generated image are compared against the
-feature maps of the content and style images
-
 ## Requirements
 * PyTorch
 * Torchvision
