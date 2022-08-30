@@ -19,7 +19,8 @@ stylized images produced from transformation networks.
     <img src="examples/transfers/picasso.jpg" width="240" height="160"/>
     <img src="examples/transfers/great_wave.jpg" width="240" height="160"/>
 </p>
-      
+
+Stylized versions of _Tuebingen Neckarfront_ by Andreas Praefcke (top left). 
 
 ## Background
 Style transfer is the task of generating an image that resembles the content
