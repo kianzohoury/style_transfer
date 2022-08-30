@@ -46,11 +46,11 @@ once trained, the latter method is much faster (~1000x).
 - [ ] Finish training transformation network on COCO for method 2.
 
 ## Requirements
-* PyTorch
-* Torchvision
-* Pillow
-* Matplotlib
-* Tqdm
+* [PyTorch](https://pytorch.org/)
+* [Torchvision](https://pytorch.org/vision/stable/index.html)
+* [Pillow](https://pillow.readthedocs.io/en/stable/)
+* [Matplotlib](https://matplotlib.org/stable/index.html)
+* [Tqdm](https://tqdm.github.io/)
 
 ## Installation                                                
 Clone the repo to install:                                     
