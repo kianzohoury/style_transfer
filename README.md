@@ -37,7 +37,10 @@ Clone the repo to install:
 ```                                                            
 $ git clone https://github.com/kianzohoury/style_transfer.git  
 ```                                                            
-
+And install the dependencies with the PyPi package manager:
+```
+$ pip install .
+```
 ## Usage
 ### Gatys et al. Method
 To run style transfer using the method outlined by Gatys et. al, execute the
