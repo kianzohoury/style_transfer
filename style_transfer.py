@@ -149,7 +149,10 @@ def run_gatys_style_transfer(
                 display_image(
                     img=generated_image, title="Generated Image"
                 )
-            tensor_to_image(generated_image).save(f"{epoch}_{save_path}")
+            if kwargs.get("save_all", False):
+                tensor_to_image(generated_image).save(
+                    f"{save_path}_iter_{epoch * display_freq}"
+                )
     print("Style transfer is complete.")
     # Save image.
     if save_path is not None:
