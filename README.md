@@ -8,23 +8,36 @@ A PyTorch implementation of two original works in Neural Style Transfer:
 with additional modifications to the second method to improve the quality of
 stylized images produced from transformation networks.
 
+                                                  
+<img src="examples/content/tuebingen_neckarfront.jpeg" width=48% height=250/>         
+<img src="examples/transfers/starry_night.jpg" width=48% height=250/> 
+<figure> 
+    <figcaption>
+        Photo of <it>Tuebingen Neckarfront</it> by Andreas Praefcke (left) and a
+        version in the style of <it>Starry Night</it> by Van Gogh (right).
+    </figcaption>
+</figure> 
 
-<p align="center" style="margin: 0 auto;">                                                    
-    <img src="examples/content/tuebingen_neckarfront.jpeg" width=48% height=250/>         
-    <img src="examples/transfers/starry_night.jpg" width=48% height=250/>                                    
-</p>       
-<p align="center" style="margin: 0 auto;">   
-    <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>
-    <img src="examples/transfers/shipwreck.jpg" width="240" height="160"/>
-</p>
-<p align="center" style="margin: 0 auto">
-    <img src="examples/transfers/scream.jpg" width="240" height="160"/>
-    <img src="examples/transfers/picasso.jpg" width="240" height="160"/>
+
+[//]: # (<p align="center" style="margin: 0 auto;">   )
+
+[//]: # (    <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>)
+
+[//]: # (    <img src="examples/transfers/shipwreck.jpg" width="240" height="160"/>)
+
+[//]: # (</p>)
+
+[//]: # (<p align="center" style="margin: 0 auto">)
+
+[//]: # (    <img src="examples/transfers/scream.jpg" width="240" height="160"/>)
+
+[//]: # (    <img src="examples/transfers/picasso.jpg" width="240" height="160"/>)
 
 [//]: # (    <img src="examples/transfers/great_wave.jpg" width="240" height="160"/>)
-</p>
 
-Stylized versions of _Tuebingen Neckarfront_ by Andreas Praefcke (top left). 
+[//]: # (</p>)
+
+[//]: # (Stylized versions of _Tuebingen Neckarfront_ by Andreas Praefcke &#40;top left&#41;. )
 
 ## Background
 Style transfer is the task of generating an image that resembles the content
