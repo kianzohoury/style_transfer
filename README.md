@@ -5,6 +5,9 @@ A PyTorch implementation of two original works in Neural Style Transfer:
 * Image Style Transfer Using Convolutional Neural Networks ([Gatys et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/Gatys_Image_Style_Transfer_CVPR_2016_paper.pdf))
 * Perceptual Losses for Real-Time Style Transfer and Super-Resolution ([Johnson et. al](https://arxiv.org/pdf/1603.08155.pdf))
 
+with additional modifications to the second method to improve the quality of
+stylized images produced from transformation networks.
+
 <p float="left" style="margin: 0 auto;">
     <img src="examples/content/tuebingen_neckarfront.jpeg" width="240" height="160"/>
     <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>
