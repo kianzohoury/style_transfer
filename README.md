@@ -13,8 +13,8 @@ stylized images produced from transformation networks.
     <img src="examples/transfers/starry_night.jpg" width=48% height=250/> 
     <figure> 
         <figcaption>
-            Photo of <it>Tuebingen Neckarfront</it> by Andreas Praefcke (left) and a
-            version in the style of <it>Starry Night</it> by Van Gogh (right).
+            Photo of <i>Tuebingen Neckarfront</i> by Andreas Praefcke (left) and a
+            version in the style of <i>Starry Night</i> by Van Gogh (right).
         </figcaption>
     </figure> 
 </div>
