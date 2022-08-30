@@ -1,9 +1,14 @@
 
 import torch
+import torch.backends.cudnn
 import torch.nn as nn
 
 
 from typing import Callable, List
+
+# Use CNN GPU optimizations if available.
+if torch.backends.cudnn.is_available():
+    torch.backends.cudnn.benchmark = True
 
 
 class InputNorm(nn.Module):
