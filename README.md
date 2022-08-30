@@ -9,17 +9,16 @@ with additional modifications to the second method to improve the quality of
 stylized images produced from transformation networks.
 
 <center>
-<p style="margin: 0 auto;">
-    <img src="examples/content/tuebingen_neckarfront.jpeg" width="240" height="160"/>
-    <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>
-    <img src="examples/transfers/shipwreck.jpg" width="240" height="160"/>
-</p>
-
-<p style="margin: 0 auto">
-    <img src="examples/transfers/scream.jpg" width="240" height="160"/>
-    <img src="examples/transfers/picasso.jpg" width="240" height="160"/>
-    <img src="examples/transfers/great_wave.jpg" width="240" height="160"/>
-</p>
+    <p style="margin: 0 auto;">
+        <img src="examples/content/tuebingen_neckarfront.jpeg" width="240" height="160"/>
+        <img src="examples/transfers/kandinsky.jpg" width="240" height="160"/>
+        <img src="examples/transfers/shipwreck.jpg" width="240" height="160"/>
+    </p>
+    <p style="margin: 0 auto">
+        <img src="examples/transfers/scream.jpg" width="240" height="160"/>
+        <img src="examples/transfers/picasso.jpg" width="240" height="160"/>
+        <img src="examples/transfers/great_wave.jpg" width="240" height="160"/>
+    </p>
 </center>       
 
 ## Background
