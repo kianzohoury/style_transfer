@@ -39,7 +39,7 @@ $ git clone https://github.com/kianzohoury/style_transfer.git
 ```                                                            
 and install the dependencies with the PyPi package manager:
 ```
-$ pip install .
+$ pip install style_transfer
 ```
 ## Usage
 ### Gatys et al. Method
