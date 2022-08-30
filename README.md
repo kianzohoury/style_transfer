@@ -8,16 +8,16 @@ A PyTorch implementation of two original works in Neural Style Transfer:
 with additional modifications to the second method to improve the quality of
 stylized images produced from transformation networks.
 
-                                                  
-<img src="examples/content/tuebingen_neckarfront.jpeg" width=48% height=250/>         
-<img src="examples/transfers/starry_night.jpg" width=48% height=250/> 
-<figure> 
-    <figcaption>
-        Photo of <it>Tuebingen Neckarfront</it> by Andreas Praefcke (left) and a
-        version in the style of <it>Starry Night</it> by Van Gogh (right).
-    </figcaption>
-</figure> 
-
+<div align="center" style="margin: 0 auto;">                                                    
+    <img src="examples/content/tuebingen_neckarfront.jpeg" width=48% height=250/>         
+    <img src="examples/transfers/starry_night.jpg" width=48% height=250/> 
+    <figure> 
+        <figcaption>
+            Photo of <it>Tuebingen Neckarfront</it> by Andreas Praefcke (left) and a
+            version in the style of <it>Starry Night</it> by Van Gogh (right).
+        </figcaption>
+    </figure> 
+</div>
 
 [//]: # (<p align="center" style="margin: 0 auto;">   )
 
