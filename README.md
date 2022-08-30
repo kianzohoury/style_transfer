@@ -25,18 +25,18 @@ find an acceptable tradeoff between the _content representation_ and
 _style representation_ of the image that leads to visually aesthetic results.
 With CNNs, the feature maps of the generated image can be compared against
 
-## Installation
-Clone the repo to install:
-```
-$ git clone https://github.com/kianzohoury/style_transfer.git
-```
-
 ## Requirements
 * PyTorch
 * Torchvision
 * Pillow
 * Matplotlib
 * Tqdm
+
+## Installation                                                
+Clone the repo to install:                                     
+```                                                            
+$ git clone https://github.com/kianzohoury/style_transfer.git  
+```                                                            
 
 ## Usage
 ### Gatys et al. Method
