@@ -24,11 +24,27 @@ Stylized versions of _Tuebingen Neckarfront_ by Andreas Praefcke (top left).
 
 ## Background
 Style transfer is the task of generating an image that resembles the content
-information of one image while sharing the style or _look_ of another image.
-Unlike other well defined image tasks, the objective with style transfer is to
-find an acceptable tradeoff between the _content representation_ and
+or spatial information of one image, but shares the style or _look_ of another
+image. Unlike other well defined image tasks, the objective with style transfer
+is to strike a balance between the content representation_ and
 _style representation_ of the image that leads to visually aesthetic results.
-With CNNs, the feature maps of the generated image can be compared against
+Therefore, the success of a style transfer depends on how well an image can
+be artistically reimagined without deforming the image or making it
+unrecognizable.
+
+In both methods, a pretrained CNN acts as a "loss network" by producing the
+feature maps corresponding to certain layers, which are calculated for the
+generated, content and style images. The loss of the generated image is
+computed by weighting and combining content and style losses. In the first method,
+the optimization is on the generated image directly, whereas in the second method,
+a separate transformation network is trained to produce images directly. In fact,
+once trained, the latter method is much faster (~1000x).
+
+
+
+is used to produce feature maps of the 
+With CNNs, the feature maps of the generated image are compared against the
+feature maps of the content and style images
 
 ## Requirements
 * PyTorch
