@@ -26,7 +26,7 @@ Stylized versions of _Tuebingen Neckarfront_ by Andreas Praefcke (top left).
 Style transfer is the task of generating an image that resembles the content
 or spatial information of one image, but shares the style or _look_ of another
 image. Unlike other well defined image tasks, the objective with style transfer
-is to strike a balance between the content representation_ and
+is to strike a balance between the _content representation_ and
 _style representation_ of the image that leads to visually aesthetic results.
 Therefore, the success of a style transfer depends on how well an image can
 be artistically reimagined without deforming the image or making it
