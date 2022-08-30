@@ -77,13 +77,13 @@ $ python3 -m style_transfer gatys \
 
 #### Options
 
-`--content` (str): path to the content image
+`--content-src` (str): path to the content image
 
-`--style` (str): path to the style image
+`--style-src` (str): path to the style image
 
-`--save` (str): path to save the generated image
+`--save-path` (str): path to save the generated image
 
-`--iters` (int): number of optimization steps or updates to the image
+`--num-iters` (int): number of optimization steps or updates to the image
 
 `--alpha` (float): content loss weight
 
