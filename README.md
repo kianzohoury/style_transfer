@@ -62,6 +62,9 @@ once trained, the latter method is much faster (~1000x).
 - [ ] Finish color preservation (luminance transfer)     
 - [ ] Finish training transformation network on COCO for method 2.
 
+## Colab Notebook
+An interactive notebook can be accessed [here](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing).
+
 ## Requirements
 * [PyTorch](https://pytorch.org/) (>=1.12.1)
 * [Torchvision](https://pytorch.org/vision/stable/index.html) (>=0.13.1)
@@ -142,8 +145,4 @@ generated_image = run_gatys_style_transfer(
 
 ### Johnson et al. Method
 - [ ] TODO
-
-## Colab Notebook
-An interactive notebook can be accessed [here](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing).       
      
-
