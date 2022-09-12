@@ -3,6 +3,7 @@ import torch
 import torchvision
 
 
+from facenet_pytorch import MTCNN
 from .models import LossNet, total_variation_loss
 from torch.optim import LBFGS
 from tqdm import tqdm
