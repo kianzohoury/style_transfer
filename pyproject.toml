@@ -15,5 +15,5 @@ dependencies = [
     "Pillow>=7.1.2",
     "matplotlib>=3.2.2",
     "tqdm>=4.64.0",
-    "facenet_pytorch>=2.5.2"
+    "facenet-pytorch>=2.5.2"
 ]
