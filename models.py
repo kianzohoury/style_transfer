@@ -52,6 +52,15 @@ class LossNet(nn.Module):
     ):
         super(LossNet, self).__init__()
         self.network = nn.Sequential()
+
+        # store constructor args for loading model during inference
+        self.content_image = content_image.clone()
+        self.style_image = style_image.clone()
+        self.content_labels = content_labels[:]
+        self.style_labels = style_labels[:]
+        self.mean = mean
+        self.std = std
+
         self.network.add_module(
             "input_norm",
             InputNorm(mean=mean, std=std).to(content_image.device)
