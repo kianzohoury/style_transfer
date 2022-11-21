@@ -10,8 +10,10 @@ from pathlib import Path
 
 
 def model_fn(model_dir):
-    state_dict = torch.load(Path(model_dir, "model.pth"))
-    LossNet()
+    checkpoint_data = torch.load(Path(model_dir, "model.pth"))
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = LossNet(**checkpoint_data).to(device)
+    return model
 
 
 def main():
@@ -43,7 +45,7 @@ def main():
     parser.add_argument(
         '--style-src',
         type=str,
-        default=os.environ['SM_CHANNEL_STYLE_SRC']
+        default="./examples/style/van_gogh_starry_night.jpeg"
     )
     parser.add_argument(
         '--display', type=bool, default=True
