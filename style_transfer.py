@@ -86,7 +86,7 @@ def run_gatys_style_transfer(
     if kwargs.get("model_dir", None):
         state_dict = loss_network.cpu().state_dict()
         torch.save({
-            "state_dict": state_dict,
+            "model": state_dict,
             "content_image": loss_network.content_image,
             "style_image": loss_network.style_image,
             "content_labels": loss_network.content_labels,

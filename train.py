@@ -1,13 +1,17 @@
 
 import os
+import torch
 
 
 from argparse import ArgumentParser
 from style_transfer import run_gatys_style_transfer
+from models import LossNet
+from pathlib import Path
 
 
 def model_fn(model_dir):
-    pass
+    state_dict = torch.load(Path(model_dir, "model.pth"))
+    LossNet()
 
 
 def main():
@@ -28,14 +32,18 @@ def main():
     parser.add_argument(
         '--save-path', type=str, default=os.environ['SM_OUTPUT_DATA_DIR']
     )
-    # parser.add_argument(
-    #     '--model-dir', type=str, default=os.environ['SM_MODEL_DIR']
-    # )
     parser.add_argument(
-        '--content-src', type=str, default=os.environ['SM_CHANNEL_CONTENT_SRC']
+        '--model-dir', type=str, default=os.environ['SM_MODEL_DIR']
     )
     parser.add_argument(
-        '--style-src', type=str, default=os.environ['SM_CHANNEL_STYLE_SRC']
+        '--content-src',
+        type=str,
+        default="./examples/content/tuebingen_neckarfront.jpeg"
+    )
+    parser.add_argument(
+        '--style-src',
+        type=str,
+        default=os.environ['SM_CHANNEL_STYLE_SRC']
     )
     parser.add_argument(
         '--display', type=bool, default=True
