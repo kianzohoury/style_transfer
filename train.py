@@ -32,10 +32,10 @@ def main():
     #     '--model-dir', type=str, default=os.environ['SM_MODEL_DIR']
     # )
     parser.add_argument(
-        '--content-src', type=str, default=os.environ['SM_CHANNEL_CONTENT']
+        '--content-src', type=str, default=os.environ['SM_CHANNEL_CONTENT_SRC']
     )
     parser.add_argument(
-        '--style-src', type=str, default=os.environ['SM_CHANNEL_STYLE']
+        '--style-src', type=str, default=os.environ['SM_CHANNEL_STYLE_SRC']
     )
     parser.add_argument(
         '--display', type=bool, default=True
