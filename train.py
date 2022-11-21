@@ -23,7 +23,7 @@ def main():
     parser.add_argument('--image-size', type=tuple, default=(512, 512))
     parser.add_argument('--normalize-input', type=bool, default=True)
     parser.add_argument('--alpha', type=float, default=1.0)
-    parser.add_argument('--beta', type=float, default=1.0e-6)
+    parser.add_argument('--beta', type=float, default=1.0e6)
     parser.add_argument('--num-iters', type=int, default=100)
     parser.add_argument('--lr', type=float, default=1.0)
     parser.add_argument('--tv-reg', type=float, default=1.0e-6)
