@@ -3,7 +3,7 @@ import os
 
 
 from argparse import ArgumentParser
-from .style_transfer import run_gatys_style_transfer
+from style_transfer import run_gatys_style_transfer
 
 
 def model_fn(model_dir):
