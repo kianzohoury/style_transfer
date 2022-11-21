@@ -4,6 +4,7 @@ import torchvision
 
 
 # from facenet_pytorch import MTCNN
+from pathlib import Path
 from .models import LossNet, total_variation_loss
 from torch.optim import LBFGS
 from tqdm import tqdm
@@ -80,6 +81,21 @@ def run_gatys_style_transfer(
         std=[0.229, 0.224, 0.225] if normalize_input else [1.0, 1.0, 1.0]
     )
     loss_network = loss_network.requires_grad_(False).eval()
+
+    # save network for inference
+    if kwargs.get("model_dir", None):
+        state_dict = loss_network.cpu().state_dict()
+        torch.save({
+            "state_dict": state_dict,
+            "content_image": loss_network.content_image,
+            "style_image": loss_network.style_image,
+            "content_labels": loss_network.content_labels,
+            "style_labels": loss_network.style_labels,
+            "mean": loss_network.mean,
+            "std": loss_network.std
+        },
+            f=str(Path(kwargs.get("model_dir"), "model.pth"))
+        )
 
     # Initialize image.
     if random:
