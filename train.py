@@ -32,7 +32,9 @@ def main():
 
     # train/test and output paths
     parser.add_argument(
-        '--save-path', type=str, default=os.environ['SM_OUTPUT_DATA_DIR']
+        '--save-path',
+        type=str,
+        default=str(Path(os.environ['SM_OUTPUT_DATA_DIR'], "result.jpeg"))
     )
     parser.add_argument(
         '--model-dir', type=str, default=os.environ['SM_MODEL_DIR']
@@ -48,7 +50,7 @@ def main():
         default="./examples/style/van_gogh_starry_night.jpeg"
     )
     parser.add_argument(
-        '--display', type=bool, default=True
+        '--display', type=bool, default=False
     )
 
     # parse CL args
