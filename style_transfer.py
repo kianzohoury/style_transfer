@@ -93,8 +93,8 @@ def run_gatys_style_transfer(
         model=torchvision.models.vgg16(weights=VGG16_Weights).features.to(device),
         content_image=content_image,
         style_image=style_image,
-        content_labels=content_labels or _VGG_CONTENT_DEFAULT,
-        style_labels=style_labels or _VGG_STYLE_DEFAULT,
+        content_labels=_VGG_CONTENT_DEFAULT if content_labels == "default" else content_labels or [],
+        style_labels=_VGG_STYLE_DEFAULT if style_labels == "default" else style_labels or [],
         mean=[0.485, 0.456, 0.406] if normalize_input else [0, 0, 0],
         std=[0.229, 0.224, 0.225] if normalize_input else [1.0, 1.0, 1.0]
     )
