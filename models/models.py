@@ -199,9 +199,13 @@ def total_variation_loss(feature_maps: torch.Tensor) -> torch.Tensor:
     using square root to aggregate squared differences.
     """
     # sum right neighbor pixel differences
-    loss = (feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:]) ** 2
+    loss = torch.sum(
+        (feature_maps[:, :, :, :-1] - feature_maps[:, :, :, 1:]) ** 2
+    )
     # sum lower neighbor pixel differences
-    loss += (feature_maps[:, :, :-1, :] - feature_maps[:, :, 1:, :]) ** 2
+    loss += torch.sum(
+        (feature_maps[:, :, :-1, :] - feature_maps[:, :, 1:, :]) ** 2
+    )
     # return the mean loss
     return loss / feature_maps.numel()
 

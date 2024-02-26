@@ -23,8 +23,8 @@ def run_gatys_style_transfer(
     content_src: str,
     style_src: str,
     image_size: Union[int, Tuple[int, int]] = (512, 512),
-    content_labels: Optional[List[str]] = None,
-    style_labels: Optional[List[str]] = None,
+    content_labels: Optional[Union[List[str], str]] = "default",
+    style_labels: Optional[Union[List[str], str]] = "default",
     normalize_input: bool = True,
     alpha: float = 1.0,
     beta: float = 1e3,
@@ -37,6 +37,7 @@ def run_gatys_style_transfer(
     save_fp: Optional[str] = None,
     save_gif: bool = False,
     save_all: bool = False,
+    save_losses: bool = False,
     display: bool = False
 ) -> Image:
     """Runs Gatys et al. neural style transfer method and returns the resulting image.
@@ -44,14 +45,12 @@ def run_gatys_style_transfer(
     Args:
         content_src (str): Path to content image.
         style_src (str): Path to style image.
-        image_size (Tuple[int, int]): Shape to resize images.
+        image_size (tuple): Shape to resize images.
             Default: (512, 512).
-        content_labels (Optional[List[str]]): Layers to calculate content
-            losses from. If None is specified, it defaults to conv_4_2 in VGG16.
-            Default: None.
-        style_labels (Optional[List[str]]): Layers to calculate style losses
-            from. If None is specified, it defaults to conv_1_1 through
-            conv_4_1 in VGG16.
+        content_labels (list, str, optional): Layers to calculate content losses from. If None is specified, content
+            representation layers are ignored. Defaults to conv_4_2 in VGG16.
+        style_labels (list, str, optional): Layers to calculate style losses from. If None is specified, style
+            representation layers are ignored. Defaults to conv_1_1 through conv_4_1 in VGG16.
         normalize_input (bool): Normalizes input using statistics for VGG19.
             Default: True.
         alpha (float): Content loss weight. Default: 1.0.
@@ -68,6 +67,8 @@ def run_gatys_style_transfer(
         save_gif (bool): If True, saves a .gif version of the image saved under `save_fp`. Default: False.
         save_all (bool): If True, saves a folder of all intermediate images in the same directory as `save_fp`.
             Default: False.
+        save_losses (bool): If True, saves the losses at each optimization step as .txt file in the same directory
+            as `save_fp`. Default: False
         display (bool): Whether to display intermediate images after each optimization step. Default: True.
 
     Returns:
@@ -81,6 +82,11 @@ def run_gatys_style_transfer(
     style_image = load_image(
         filepath=style_src, size=list(image_size), device=device
     )
+
+    # check that at least content or style is being optimized
+    if not (content_labels or style_labels):
+        raise ValueError("At least one of content_labels or style_labels must be provided.")
+    # if only one of content/style labels are included, the optimisation task is similar to feature inversion.
 
     # Load pretrained loss network (VGG16)
     loss_network = VGGLossNet(
@@ -104,6 +110,7 @@ def run_gatys_style_transfer(
 
     # Load optimizer.
     optimizer = LBFGS([generated_image], lr=lr, max_iter=lbfgs_iters)
+    losses = []
 
     all_images, best_image, best_loss = [], None, float("inf")
     print("Starting style transfer using direct optimization...")
@@ -143,13 +150,14 @@ def run_gatys_style_transfer(
 
         # Optimization step.
         curr_loss = optimizer.step(closure)
+        losses.append(curr_loss)
 
         # Display losses.
         print(
-            f"Total Loss: {curr_loss:.6f}\n"
-            f"Content Loss: {content_loss:.6f}\n"
-            f"Style Loss: {style_loss:.6f}\n"
-            f"TV Loss: {style_loss:.6f}"
+            f"Total Loss: {curr_loss:.12f}\n"
+            f"Content Loss: {content_loss:.12f}\n"
+            f"Style Loss: {style_loss:.12f}\n"
+            f"TV Loss: {style_loss:.12f}\n"
         )
 
         # Save best image.
@@ -193,4 +201,9 @@ def run_gatys_style_transfer(
             duration=100,
             loop=0
         )
+    if save_losses:
+        with open(Path(save_fp).parent / Path(save_fp).stem + "_losses.txt", mode="w") as f:
+            for i in range(len(losses)):
+                f.write(f"iter: {(i + 1) * lbfgs_iters} {losses[i]}")
+
     return best_image
