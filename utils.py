@@ -1,7 +1,7 @@
 
 import matplotlib.pyplot as plt
 import torch
-import torchvision.transforms.functional as TF
+import torchvision.transforms.functional as F
 
 
 from PIL import Image
@@ -11,8 +11,8 @@ from typing import List, Tuple, Union
 def load_image(filepath: str, size: List[int], device: str) -> torch.Tensor:
     """Loads image as a tensor, given a filepath, device and output size."""
     img = Image.open(fp=filepath)
-    img_tensor = TF.to_tensor(img).to(device).float()
-    img_tensor = TF.resize(img_tensor, size=size).unsqueeze(0)
+    img_tensor = F.to_tensor(img).to(device).float()
+    img_tensor = F.resize(img_tensor, size=size).unsqueeze(0)
     return img_tensor
 
 
@@ -22,7 +22,7 @@ def tensor_to_image(img_tensor: torch.Tensor) -> Image.Image:
     img_tensor = img_tensor.squeeze(0) if img_tensor.dim() == 4 else img_tensor
     with torch.no_grad():
         img_tensor.clamp_(0, 1)
-    img = TF.to_pil_image(img_tensor)
+    img = F.to_pil_image(img_tensor)
     return img
 
 
