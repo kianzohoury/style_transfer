@@ -177,16 +177,15 @@ def run_gatys_style_transfer(
         best_image.save(save_fp)
         print(f"Saved result to {save_fp}.")
     if save_all:
-        save_dir = Path(save_fp).parent / Path(save_fp).stem + "_all"
-        if not save_dir.is_dir():
-            save_dir.mkdir(parents=True)
-        else:
+        save_dir = Path(save_fp).parent / (Path(save_fp).stem + "_all")
+        if save_dir.is_dir():
             shutil.rmtree(save_dir)
+        save_dir.mkdir(parents=True)
 
         # save all intermediate images
         for i in range(len(all_images)):
             all_images[i].save(
-                save_dir / Path(save_fp).stem + f"_{(i + 1) * lbfgs_iters}" + Path(save_fp).suffix
+                save_dir / (Path(save_fp).stem + f"_iter_{(i + 1) * lbfgs_iters}" + Path(save_fp).suffix)
             )
         print(f"Saved all outputs to {save_dir}.")
     if save_gif:
@@ -195,12 +194,13 @@ def run_gatys_style_transfer(
         else:
             starting_image = all_images.pop(0)
         starting_image.save(
-            fp=Path(save_fp).parent / Path(save_fp).stem + ".gif",
+            fp=Path(save_fp).parent / (Path(save_fp).stem + ".gif"),
             save_all=True,
-            append_images=all_images,
-            duration=100,
+            append_images=all_images + all_images[1:-1][::-1],
+            duration=2500 / len(all_images),
             loop=0
         )
+        print(f"Saved animation to {Path(save_fp).stem}.gif.")
     if save_losses:
         with open(Path(save_fp).parent / Path(save_fp).stem + "_losses.txt", mode="w") as f:
             for i in range(len(losses)):
