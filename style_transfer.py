@@ -201,6 +201,6 @@ def run_gatys_style_transfer(
     if save_losses:
         with open(Path(save_fp).parent / (Path(save_fp).stem + "_losses.txt"), mode="w") as f:
             for i in range(len(losses)):
-                f.write(f"iter: {(i + 1) * lbfgs_iters}, loss: {losses[i]}")
+                f.write(f"iter: {(i + 1) * lbfgs_iters}, loss: {losses[i]}\n")
 
     return best_image
