@@ -236,6 +236,6 @@ def perceptual_loss(
 
     # additionally calculate TV loss
     if generated_img is not None:
-        tv_loss += total_variation_loss(generated_img)
-        loss += tv_weight * tv_loss
+        tv_loss += tv_weight * total_variation_loss(generated_img)
+        loss += tv_loss
     return [loss, c_loss, s_loss, tv_loss]

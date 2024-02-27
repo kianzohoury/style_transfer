@@ -29,7 +29,7 @@ def tensor_to_image(img_tensor: torch.Tensor) -> Image.Image:
 def display_image(
     img: Union[Image.Image, torch.Tensor],
     title: str,
-    figsize: Tuple[int] = (6, 6),
+    figsize: Tuple[int] = (3, 3),
     dpi=200
 ) -> None:
     """Displays an image with a title."""

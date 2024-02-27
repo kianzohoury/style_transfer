@@ -37,10 +37,13 @@ def run_gatys_style_transfer(
     save_fp: Optional[str] = None,
     save_gif: bool = False,
     save_all: bool = False,
-    save_losses: bool = False,
-    display: bool = False
+    save_losses: bool = False
 ) -> Image:
-    """Runs Gatys et al. neural style transfer method and returns the resulting image.
+    """Runs Gatys et al.'s neural style transfer method and returns the resulting image.
+
+    Since it performs optimization steps on an image directly, this method is considerably slow. It is recommended
+    to keep the number of L-BFGS optimizer iterations relatively small (e.g. <= 20), as higher numbers do not
+    significantly improve results.
 
     Args:
         content_src (str): Path to content image.
@@ -69,7 +72,6 @@ def run_gatys_style_transfer(
             Default: False.
         save_losses (bool): If True, saves the losses at each optimization step as .txt file in the same directory
             as `save_fp`. Default: False
-        display (bool): Whether to display intermediate images after each optimization step. Default: True.
 
     Returns:
         Image: Final generated image.
@@ -86,7 +88,7 @@ def run_gatys_style_transfer(
     # check that at least content or style is being optimized
     if not (content_labels or style_labels):
         raise ValueError("At least one of content_labels or style_labels must be provided.")
-    # if only one of content/style labels are included, the optimisation task is similar to feature inversion.
+    # if only one of content/style labels are included, the optimization task is similar to feature inversion.
 
     # Load pretrained loss network (VGG16)
     loss_network = VGGLossNet(
@@ -165,11 +167,6 @@ def run_gatys_style_transfer(
             best_loss = curr_loss
             best_image = tensor_to_image(generated_image.detach().clone())
 
-        # Display generated image so far.
-        if display:
-            display_image(
-                img=generated_image, title="Generated Image"
-            )
         if save_all or save_gif:
             all_images.append(tensor_to_image(generated_image))
     print("Style transfer is complete.")
@@ -202,8 +199,8 @@ def run_gatys_style_transfer(
         )
         print(f"Saved animation to {Path(save_fp).stem}.gif.")
     if save_losses:
-        with open(Path(save_fp).parent / Path(save_fp).stem + "_losses.txt", mode="w") as f:
+        with open(Path(save_fp).parent / (Path(save_fp).stem + "_losses.txt"), mode="w") as f:
             for i in range(len(losses)):
-                f.write(f"iter: {(i + 1) * lbfgs_iters} {losses[i]}")
+                f.write(f"iter: {(i + 1) * lbfgs_iters}, loss: {losses[i]}")
 
     return best_image
