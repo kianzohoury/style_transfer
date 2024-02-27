@@ -164,6 +164,77 @@ class VGGLossNet(nn.Module):
         return self.network(image)
 
 
+class ResidualBlock(nn.Module):
+    """Residual block scheme for `TransformationNetwork`."""
+    def __init__(self, num_channels: int):
+        super().__init__()
+        self.num_channels = num_channels
+        self.conv = nn.Sequential(
+            nn.Conv2d(num_channels, num_channels, 3, padding="same", bias=False),
+            nn.BatchNorm2d(num_channels),
+            nn.ReLU(),
+            nn.Conv2d(num_channels, num_channels, 3, padding="same", bias=False),
+            nn.BatchNorm2d(num_channels)
+        )
+
+    def forward(self, features: torch.Tensor) -> torch.Tensor:
+        return self.conv(features) + features
+
+
+class TransformationNetwork(nn.Module):
+    """Style Transformation network proposed in Johnson et al."""
+    def __init__(self):
+        super(TransformationNetwork, self).__init__()
+        self.conv_in = nn.Sequential(
+            nn.Conv2d(3, 32, 9, stride=1, padding="same", bias=False),
+            nn.BatchNorm2d(32),
+            nn.ReLU(),
+        )
+        self.down_1 = nn.Sequential(
+            nn.Conv2d(32, 64, 3, stride=2, bias=False),
+            nn.BatchNorm2d(64),
+            nn.ReLU()
+        )
+        self.down_2 = nn.Sequential(
+            nn.Conv2d(64, 128, 3, stride=2, bias=False),
+            nn.BatchNorm2d(128),
+            nn.ReLU()
+        )
+        self.residual = nn.Sequential(
+            ResidualBlock(num_channels=128),
+            ResidualBlock(num_channels=128),
+            ResidualBlock(num_channels=128),
+            ResidualBlock(num_channels=128),
+            ResidualBlock(num_channels=128)
+        )
+        self.up_1 = nn.ConvTranspose2d(128, 64, 3, stride=2, bias=False)
+        self.act_1 = nn.Sequential(
+            nn.BatchNorm2d(64),
+            nn.ReLU()
+        )
+        self.up_2 = nn.ConvTranspose2d(64, 32, 3, stride=2, bias=False)
+        self.act_2 = nn.Sequential(
+            nn.BatchNorm2d(32),
+            nn.ReLU()
+        )
+        self.conv_out = nn.Sequential(
+            nn.ConvTranspose2d(32, 3, 9, stride=1, bias=False),
+            nn.BatchNorm2d(3),
+            nn.ReLU()
+        )
+        self.sigmoid = nn.Sigmoid()
+
+    def forward(self, image: torch.Tensor) -> torch.Tensor:
+        x = self.conv_in(image)
+        down_1 = self.down_1(x)
+        down_2 = self.down_2(down_1)
+        residual = self.residual(down_2)
+        up_1 = self.act_1(self.up_1(residual, output_size=down_1.size()))
+        up_2 = self.act_2(self.up_2(up_1, output_size=x.size()))
+        out = self.sigmoid(up_2)
+        return out
+
+
 def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
     """Returns the normalized Gram matrix of the input features."""
     n, c, h, w = feature_maps.shape
