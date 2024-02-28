@@ -56,16 +56,20 @@ class VGGLossNet(nn.Module):
     style_layer = List[LossLayer]
     
     def __init__(
-            self,
-            model: nn.Module,
-            content_image: torch.Tensor,
-            style_image: torch.Tensor,
-            content_labels: List[str],
-            style_labels: List[str],
+        self,
+        model: nn.Module,
+        content_image: torch.Tensor,
+        style_image: torch.Tensor,
+        content_labels: List[str],
+        style_labels: List[str],
     ):
         super(VGGLossNet, self).__init__()
         self.content_layers, self.style_layers = [], []
         self.network = nn.Sequential()
+
+        # temporary fix to make compatible with Johnson et al. method
+        # TODO
+        self.content_network = nn.Sequential()
 
         # store constructor args 
         self.content_image = content_image.clone()
@@ -114,6 +118,8 @@ class VGGLossNet(nn.Module):
             if label not in loss_labels:
                 # add the current layer
                 self.network.add_module(label, layer)
+                # TODO
+                self.content_network.add_module(label, layer)
                 i += 1
             else:
                 j = i + 1
@@ -126,6 +132,8 @@ class VGGLossNet(nn.Module):
                 # add layers so far to the network
                 for named_layer in named_layers[i:j]:
                     self.network.add_module(*named_layer)
+                    # TODO
+                    self.content_network.add_module(label, layer)
 
                 if self.content_labels and label == self.content_labels[0]:
                     content_label = self.content_labels.pop(0)
@@ -135,6 +143,10 @@ class VGGLossNet(nn.Module):
                         target_features=content_features, loss_fn=content_loss
                     )
                     self.network.add_module(
+                        f"content_{content_label}", content_layer
+                    )
+                    # TODO
+                    self.content_network.add_module(
                         f"content_{content_label}", content_layer
                     )
                     self.content_layers.append(content_layer)
@@ -164,6 +176,10 @@ class VGGLossNet(nn.Module):
     def forward(self, image: torch.Tensor) -> List[List[LossLayer]]:
         """Returns the feature maps resulting from the final layer in the loss network."""
         return self.network(image)
+
+    def update_content_image(self, image: torch.Tensor) -> None:
+        content_features = self.content_network(image).detach()
+        self.content_layers[0].target_features = content_features
 
 
 class ResidualBlock(nn.Module):
