@@ -15,8 +15,6 @@ from .utils import display_image, load_image, tensor_to_image
 # Default content and style loss layers.
 _VGG_CONTENT_DEFAULT = ["conv_4_2"]
 _VGG_STYLE_DEFAULT = ["conv_1_1", "conv_2_1", "conv_3_1", "conv_4_1"]
-_VGG_IMAGENET_MEAN = [0.485, 0.456, 0.406]
-_VGG_IMAGENET_STD = [0.229, 0.224, 0.225]
 
 
 def run_gatys_style_transfer(
@@ -25,7 +23,6 @@ def run_gatys_style_transfer(
     image_size: Union[int, Tuple[int, int]] = (512, 512),
     content_labels: Optional[Union[List[str], str]] = "default",
     style_labels: Optional[Union[List[str], str]] = "default",
-    normalize_input: bool = True,
     alpha: float = 1.0,
     beta: float = 1e3,
     lbfgs_iters: int = 10,
@@ -54,8 +51,6 @@ def run_gatys_style_transfer(
             representation layers are ignored. Defaults to conv_4_2 in VGG16.
         style_labels (list, str, optional): Layers to calculate style losses from. If None is specified, style
             representation layers are ignored. Defaults to conv_1_1 through conv_4_1 in VGG16.
-        normalize_input (bool): Normalizes input using statistics for VGG19.
-            Default: True.
         alpha (float): Content loss weight. Default: 1.0.
         beta (float): Style loss weight. Default: 1e3.
         lbfgs_iters (int): Max number of L-BFGS iterations per optimization step. Default: 10.
@@ -96,9 +91,7 @@ def run_gatys_style_transfer(
         content_image=content_image,
         style_image=style_image,
         content_labels=_VGG_CONTENT_DEFAULT if content_labels == "default" else content_labels or [],
-        style_labels=_VGG_STYLE_DEFAULT if style_labels == "default" else style_labels or [],
-        mean=[0.485, 0.456, 0.406] if normalize_input else [0, 0, 0],
-        std=[0.229, 0.224, 0.225] if normalize_input else [1.0, 1.0, 1.0]
+        style_labels=_VGG_STYLE_DEFAULT if style_labels == "default" else style_labels or []
     )
     loss_network = loss_network.requires_grad_(False).eval()
 

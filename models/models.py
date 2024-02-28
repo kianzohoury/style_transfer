@@ -5,6 +5,9 @@ import torch.nn.functional as F
 
 from typing import Callable, List, Optional
 
+_IMAGENET_MEAN = [0.485, 0.456, 0.406]
+_IMAGENET_STD = [0.229, 0.224, 0.225]
+
 # Use CNN GPU optimizations if available.
 if torch.backends.cudnn.is_available():
     torch.backends.cudnn.benchmark = True
@@ -59,8 +62,6 @@ class VGGLossNet(nn.Module):
             style_image: torch.Tensor,
             content_labels: List[str],
             style_labels: List[str],
-            mean: List[float],
-            std: List[float]
     ):
         super(VGGLossNet, self).__init__()
         self.content_layers, self.style_layers = [], []
@@ -71,12 +72,13 @@ class VGGLossNet(nn.Module):
         self.style_image = style_image.clone()
         self.content_labels = content_labels[:]
         self.style_labels = style_labels[:]
-        self.mean = mean
-        self.std = std
 
         self.network.add_module(
             "input_norm",
-            InputNorm(mean=mean, std=std).to(content_image.device)
+            InputNorm(
+                mean=_IMAGENET_MEAN,
+                std=_IMAGENET_STD
+            ).to(content_image.device)
         )
         
         block_i, sublayer_j = 1, 0
@@ -185,6 +187,9 @@ class TransformationNetwork(nn.Module):
     """Style Transformation network proposed in Johnson et al."""
     def __init__(self):
         super(TransformationNetwork, self).__init__()
+        self.input_norm = InputNorm(
+            mean=_IMAGENET_MEAN, std=_IMAGENET_STD
+        )
         self.conv_in = nn.Sequential(
             nn.Conv2d(3, 32, 9, stride=1, padding="same", bias=False),
             nn.BatchNorm2d(32),
@@ -225,7 +230,8 @@ class TransformationNetwork(nn.Module):
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, image: torch.Tensor) -> torch.Tensor:
-        x = self.conv_in(image)
+        x = self.input_norm(image)
+        x = self.conv_in(x)
         down_1 = self.down_1(x)
         down_2 = self.down_2(down_1)
         residual = self.residual(down_2)
