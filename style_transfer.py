@@ -6,9 +6,9 @@ import torchvision
 
 from pathlib import Path
 from PIL import Image
-from .models.models import VGGLossNet, perceptual_loss
+from .models.models import VGGLossNet, perceptual_loss, content_loss, style_loss
 from torch.optim import LBFGS
-from torchvision.models import VGG16_Weights, VGG16_BN_Weights
+from torchvision.models import VGG16_Weights
 from typing import List, Optional, Tuple, Union
 from .utils import display_image, load_image, tensor_to_image
 
@@ -85,13 +85,24 @@ def run_gatys_style_transfer(
         raise ValueError("At least one of content_labels or style_labels must be provided.")
     # if only one of content/style labels are included, the optimization task is similar to feature inversion.
 
+    if isinstance(content_labels, str) and content_labels.lower() == "default":
+        content_labels = set(_VGG_CONTENT_DEFAULT)
+    elif isinstance(content_labels, list) or isinstance(content_labels, tuple):
+        content_labels = set(content_labels)
+    else:
+        content_labels = set()
+
+    if isinstance(style_labels, str) and style_labels.lower() == "default":
+        style_labels = set(_VGG_STYLE_DEFAULT)
+    elif isinstance(style_labels, list) or isinstance(style_labels, tuple):
+        style_labels = set(style_labels)
+    else:
+        style_labels = set()
+
     # Load pretrained loss network (VGG16)
     loss_network = VGGLossNet(
         model=torchvision.models.vgg16(weights=VGG16_Weights).features.to(device),
-        content_image=content_image,
-        style_image=style_image,
-        content_labels=_VGG_CONTENT_DEFAULT if content_labels == "default" else content_labels or [],
-        style_labels=_VGG_STYLE_DEFAULT if style_labels == "default" else style_labels or []
+        feature_labels=content_labels | style_labels
     )
     loss_network = loss_network.requires_grad_(False).eval()
 
@@ -114,12 +125,12 @@ def run_gatys_style_transfer(
             f"Step [{step + 1}/{num_steps}], "
             f"Iterations [{step * lbfgs_iters}/{num_steps * lbfgs_iters}]"
         )
-        content_loss = style_loss = tv_loss = 0
+        content_loss_total = style_loss_total = tv_loss_total = 0
 
         # Define closure for the optimizer.
         def closure():
             # allows us to update losses outside of closure
-            nonlocal content_loss, style_loss, tv_loss
+            nonlocal content_loss_total, style_loss_total, tv_loss_total
 
             # Force image values to be between 0 and 1.
             with torch.no_grad():
@@ -127,19 +138,23 @@ def run_gatys_style_transfer(
             optimizer.zero_grad()
 
             # Run forward pass through loss network.
-            _ = loss_network(
-                generated_image
-            )
+            c_layers = loss_network.get_losses(generated_image, content_image, content_loss, _VGG_CONTENT_DEFAULT)
+            s_layers = loss_network.get_losses(generated_image, style_image, style_loss, _VGG_STYLE_DEFAULT)
 
             # Calculate perceptual loss.
-            loss, content_loss, style_loss, tv_loss = perceptual_loss(
-                content_losses=loss_network.content_layers,
-                style_losses=loss_network.style_layers,
+            loss, c_loss, s_loss, tv_loss = perceptual_loss(
+                content_losses=c_layers,
+                style_losses=s_layers,
                 content_weight=alpha,
                 style_weight=beta,
                 generated_img=generated_image,
                 tv_weight=tv_reg
             )
+
+            content_loss_total += c_loss
+            style_loss_total += s_loss
+            tv_loss_total += tv_loss
+
             loss.backward()
             return loss.item()
 

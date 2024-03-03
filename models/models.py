@@ -13,23 +13,6 @@ if torch.backends.cudnn.is_available():
     torch.backends.cudnn.benchmark = True
 
 
-class InputNorm(nn.Module):
-    """Normalizes input given a mean and std."""
-
-    def __init__(self, mean: List[float], std: List[float]):
-        super(InputNorm, self).__init__()
-        self.mean = nn.Parameter(
-            torch.Tensor(mean).view(-1, 1, 1), requires_grad=False
-        )
-        self.std = nn.Parameter(
-            torch.Tensor(std).view(-1, 1, 1), requires_grad=False
-        )
-
-    def forward(self, image: torch.Tensor) -> torch.Tensor:
-        normalized = (image - self.mean) / self.std
-        return normalized
-
-
 class LossLayer(nn.Module):
     """Stores the layer's loss given the target feature maps and loss fn.
 
@@ -45,46 +28,43 @@ class LossLayer(nn.Module):
         self.loss_fn = loss_fn
 
     def forward(self, generated_features: torch.Tensor) -> torch.Tensor:
-        self.loss = self.loss_fn(generated_features, self.target_features)
+        target_features = torch.broadcast_to(
+            self.target_features, generated_features.shape
+        )
+        self.loss = self.loss_fn(generated_features, target_features)
+        return generated_features
+
+
+class FeatureLayer(nn.Module):
+    """Stores the layer's loss given the target feature maps and loss fn.
+
+    Returns the unmodified input features (identity function) so they can be fed into
+    the next layer.
+    """
+    features: torch.Tensor
+
+    def __init__(self):
+        super(FeatureLayer, self).__init__()
+
+    def forward(self, generated_features: torch.Tensor) -> torch.Tensor:
+        self.features = generated_features
         return generated_features
 
 
 class VGGLossNet(nn.Module):
     """Network that computes the content and style losses."""
 
-    content_layer: List[LossLayer]
-    style_layer = List[LossLayer]
-    
     def __init__(
         self,
         model: nn.Module,
-        content_image: torch.Tensor,
-        style_image: torch.Tensor,
-        content_labels: List[str],
-        style_labels: List[str],
+        feature_labels: List[str]
     ):
         super(VGGLossNet, self).__init__()
-        self.content_layers, self.style_layers = [], []
+        self.feature_layers = {}
+        self.feature_labels = feature_labels[:]
         self.network = nn.Sequential()
+        self.features = {}
 
-        # temporary fix to make compatible with Johnson et al. method
-        # TODO
-        self.content_network = nn.Sequential()
-
-        # store constructor args 
-        self.content_image = content_image.clone()
-        self.style_image = style_image.clone()
-        self.content_labels = content_labels[:]
-        self.style_labels = style_labels[:]
-
-        self.network.add_module(
-            "input_norm",
-            InputNorm(
-                mean=_IMAGENET_MEAN,
-                std=_IMAGENET_STD
-            ).to(content_image.device)
-        )
-        
         block_i, sublayer_j = 1, 0
         named_layers = []
         for layer in list(model.children()):
@@ -110,16 +90,15 @@ class VGGLossNet(nn.Module):
             else:
                 label = layer.__class__.__name__
             named_layers.append((label, layer))
-        
+
         i = 0
-        loss_labels = set(self.content_labels) | set(self.style_labels)
+        loss_labels = self.feature_labels[:]
         while i < len(named_layers):
             label, layer = named_layers[i]
             if label not in loss_labels:
                 # add the current layer
                 self.network.add_module(label, layer)
                 # TODO
-                self.content_network.add_module(label, layer)
                 i += 1
             else:
                 j = i + 1
@@ -133,53 +112,67 @@ class VGGLossNet(nn.Module):
                 for named_layer in named_layers[i:j]:
                     self.network.add_module(*named_layer)
                     # TODO
-                    self.content_network.add_module(label, layer)
 
-                if self.content_labels and label == self.content_labels[0]:
-                    content_label = self.content_labels.pop(0)
+                if self.feature_labels and label == self.feature_labels[0]:
+                    feature_label = self.feature_labels.pop(0)
                     # add content loss layer
-                    content_features = self.network(content_image).detach()
-                    content_layer = LossLayer(
-                        target_features=content_features, loss_fn=content_loss
-                    )
+                    # content_features = self.network(content_image).detach()
+                    feature_layer = FeatureLayer()
                     self.network.add_module(
-                        f"content_{content_label}", content_layer
+                        f"feature_{feature_label}", feature_layer
                     )
                     # TODO
-                    self.content_network.add_module(
-                        f"content_{content_label}", content_layer
-                    )
-                    self.content_layers.append(content_layer)
-                if self.style_labels and label == self.style_labels[0]:
-                    style_label = self.style_labels.pop(0)
-                    # add style loss layer
-                    style_features = self.network(style_image).detach()
-                    style_layer = LossLayer(
-                        target_features=style_features, loss_fn=style_loss
-                    )
-                    self.network.add_module(
-                        f"style_{style_label}", style_layer
-                    )
-                    self.style_layers.append(style_layer)
+                    # self.content_network.add_module(
+                    #     f"content_{content_label}", content_layer
+                    # )
+                    self.feature_layers[feature_label] = feature_layer
+                # if self.style_labels and label == self.style_labels[0]:
+                #     style_label = self.style_labels.pop(0)
+                #     # add style loss layer
+                #     # style_features = self.network(style_image).detach()
+                #     style_layer = FeatureLayer()
+                #     # style_layer = LossLayer(
+                #     #     target_features=style_features, loss_fn=style_loss
+                #     # )
+                #     self.network.add_module(
+                #         f"style_{style_label}", style_layer
+                #     )
+                #     self.style_layers.append(style_layer)
                 i = j
 
             # stop building network after final content/style loss layer is added
-            if not (self.content_labels or self.style_labels):
+            if not self.feature_labels:
                 break
 
-        if self.content_labels or self.style_labels:
-            invalid_labels = set(self.content_labels) | set(self.style_labels)
-            raise ValueError(f"{invalid_labels} are not valid layers.")
-        self.content_labels = content_labels[:]
-        self.style_labels = style_labels[:]
+        # if self.content_labels or self.style_labels:
+        #     invalid_labels = set(self.content_labels) | set(self.style_labels)
+        #     raise ValueError(f"{invalid_labels} are not valid layers.")
+        # self.content_labels = content_labels[:]
+        # self.style_labels = style_labels[:]
+        self.feature_labels = feature_labels[:]
 
     def forward(self, image: torch.Tensor) -> List[List[LossLayer]]:
         """Returns the feature maps resulting from the final layer in the loss network."""
-        return self.network(image)
+        features = {}
+        self.network(image)
+        for label, feature in self.feature_layers.items():
+            features[label] = feature.features
+        self.features = features
+        return self.features
 
-    def update_content_image(self, image: torch.Tensor) -> None:
-        content_features = self.content_network(image).detach()
-        self.content_layers[0].target_features = content_features
+    def get_losses(self, generated, target, loss_fn, labels):
+        target_features = {}
+        self.forward(target)
+        for label, target_feat in self.feature_layers.items():
+            if label in labels:
+                target_features[label] = target_feat.features.detach()
+
+        losses = []
+        for label, target in target_features.items():
+            loss_layer = LossLayer(target, loss_fn)
+            loss_layer(generated[label])
+            losses.append(loss_layer)
+        return losses
 
 
 class ResidualBlock(nn.Module):
@@ -188,11 +181,13 @@ class ResidualBlock(nn.Module):
         super().__init__()
         self.num_channels = num_channels
         self.conv = nn.Sequential(
-            nn.Conv2d(num_channels, num_channels, 3, padding="same", bias=False),
+            nn.Conv2d(num_channels, num_channels, 3, padding="same", padding_mode="reflect", bias=False),
             nn.BatchNorm2d(num_channels),
+            # nn.InstanceNorm2d(num_channels, affine=True),
             nn.ReLU(),
-            nn.Conv2d(num_channels, num_channels, 3, padding="same", bias=False),
+            nn.Conv2d(num_channels, num_channels, 3, padding="same", padding_mode="reflect", bias=False),
             nn.BatchNorm2d(num_channels)
+            # nn.InstanceNorm2d(num_channels, affine=True)
         )
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
@@ -203,22 +198,22 @@ class TransformationNetwork(nn.Module):
     """Style Transformation network proposed in Johnson et al."""
     def __init__(self):
         super(TransformationNetwork, self).__init__()
-        self.input_norm = InputNorm(
-            mean=_IMAGENET_MEAN, std=_IMAGENET_STD
-        )
         self.conv_in = nn.Sequential(
-            nn.Conv2d(3, 32, 9, stride=1, padding="same", bias=False),
+            nn.Conv2d(3, 32, 9, padding="same", padding_mode="reflect", bias=False),
             nn.BatchNorm2d(32),
+            # nn.InstanceNorm2d(32, affine=True),
             nn.ReLU(),
         )
         self.down_1 = nn.Sequential(
-            nn.Conv2d(32, 64, 3, stride=2, bias=False),
+            nn.Conv2d(32, 64, 3, stride=2, padding=1, padding_mode="reflect", bias=False),
             nn.BatchNorm2d(64),
+            # nn.InstanceNorm2d(64, affine=True),
             nn.ReLU()
         )
         self.down_2 = nn.Sequential(
-            nn.Conv2d(64, 128, 3, stride=2, bias=False),
+            nn.Conv2d(64, 128, 3, stride=2, padding=1, padding_mode="reflect", bias=False),
             nn.BatchNorm2d(128),
+            # nn.InstanceNorm2d(128, affine=True),
             nn.ReLU()
         )
         self.residual = nn.Sequential(
@@ -228,41 +223,46 @@ class TransformationNetwork(nn.Module):
             ResidualBlock(num_channels=128),
             ResidualBlock(num_channels=128)
         )
-        self.up_1 = nn.ConvTranspose2d(128, 64, 3, stride=2, bias=False)
+        self.up_1 = nn.ConvTranspose2d(128, 64, 3, stride=2, padding=1, bias=False)
         self.act_1 = nn.Sequential(
             nn.BatchNorm2d(64),
+            # nn.InstanceNorm2d(64, affine=True),
             nn.ReLU()
         )
-        self.up_2 = nn.ConvTranspose2d(64, 32, 3, stride=2, bias=False)
+        self.up_2 = nn.ConvTranspose2d(64, 32, 3, stride=2, padding=1, bias=False)
         self.act_2 = nn.Sequential(
             nn.BatchNorm2d(32),
+            # nn.InstanceNorm2d(32, affine=True),
             nn.ReLU()
         )
         self.conv_out = nn.Sequential(
-            nn.ConvTranspose2d(32, 3, 9, stride=1, bias=False),
-            nn.BatchNorm2d(3),
-            nn.ReLU()
+            nn.Conv2d(32, 3, 9, padding="same", padding_mode="reflect", bias=False),
+            # nn.BatchNorm2d(3),
+            # nn.InstanceNorm2d(3, affine=True),
+            # nn.ReLU(),
+            # nn.Conv2d(3, 3, 1, padding="same")
         )
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, image: torch.Tensor) -> torch.Tensor:
-        x = self.input_norm(image)
-        x = self.conv_in(x)
+        x = self.conv_in(image)
         down_1 = self.down_1(x)
         down_2 = self.down_2(down_1)
         residual = self.residual(down_2)
         up_1 = self.act_1(self.up_1(residual, output_size=down_1.size()))
         up_2 = self.act_2(self.up_2(up_1, output_size=x.size()))
-        out = self.sigmoid(up_2)
+        out = self.conv_out(up_2)
+        # out = self.sigmoid(out)
         return out
 
 
 def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
     """Returns the normalized Gram matrix of the input features."""
     n, c, h, w = feature_maps.shape
-    feature_maps = feature_maps.reshape((n * c, h * w))
-    gram = feature_maps @ feature_maps.T
-    return gram / (n * c * h * w)
+    feature_maps = feature_maps.reshape((n, c, h * w))
+    feature_maps_t = torch.transpose(feature_maps, 1, 2)
+    gram = torch.bmm(feature_maps, feature_maps_t)
+    return gram / (c * h * w)
 
 
 def content_loss(
@@ -329,6 +329,6 @@ def perceptual_loss(
 
     # additionally calculate TV loss
     if generated_img is not None:
-        tv_loss += tv_weight * total_variation_loss(generated_img)
-        loss += tv_loss
+        tv_loss += total_variation_loss(generated_img)
+        loss += tv_weight * tv_loss
     return [loss, c_loss, s_loss, tv_loss]
