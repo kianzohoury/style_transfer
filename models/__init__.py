@@ -1,6 +1,6 @@
 
-from transformation import TransformationNetwork
-from vgg import VGGNetwork
+from .transformation import TransformationNetwork
+from .vgg import VGGNetwork
 
 import torch.backends.cudnn
 

@@ -63,12 +63,11 @@ class TransposeConv(ConvBlock):
             kernel_size=self.kernel_size,
             stride=2,
             padding=self.padding_size,
-            padding_mode=self.padding_mode,
             bias=True if self.norm_type is None else False
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.forward(x)
+        return super().forward(x)
 
 
 class UpsampleConv(ConvBlock):
@@ -152,17 +151,27 @@ class TransformationNetwork(nn.Module):
 
         # residual bottleneck
         self.residual = nn.Sequential(
-            ResidualBlock(num_channels=128, padding_mode=padding_mode),
-            ResidualBlock(num_channels=128, padding_mode=padding_mode),
-            ResidualBlock(num_channels=128, padding_mode=padding_mode),
-            ResidualBlock(num_channels=128, padding_mode=padding_mode),
-            ResidualBlock(num_channels=128, padding_mode=padding_mode)
+            ResidualBlock(
+                num_channels=128, kernel_size=3, padding_mode=padding_mode
+            ),
+            ResidualBlock(
+                num_channels=128, kernel_size=3, padding_mode=padding_mode
+            ),
+            ResidualBlock(
+                num_channels=128, kernel_size=3, padding_mode=padding_mode
+            ),
+            ResidualBlock(
+                num_channels=128, kernel_size=3, padding_mode=padding_mode
+            ),
+            ResidualBlock(
+                num_channels=128, kernel_size=3, padding_mode=padding_mode
+            )
         )
 
         if upsample_type == "transpose":
-            upsampler = UpsampleConv
-        else:
             upsampler = TransposeConv
+        else:
+            upsampler = UpsampleConv
 
         # decoder blocks
         self.up1 = upsampler(
