@@ -14,6 +14,13 @@ def gram_matrix(feature_maps: torch.Tensor) -> torch.Tensor:
     gram = torch.bmm(feature_maps, feature_maps_t)
     return gram / (c * h * w)
 
+# def gram_matrix(feature_maps):
+#     (bs, ch, h, w) = feature_maps.size()
+#     f = feature_maps.view(bs, ch, w*h)
+#     f_T = f.transpose(1, 2)
+#     G = f.bmm(f_T) / (ch * h * w)
+#     return G
+
 
 def total_variation_loss(image: torch.Tensor) -> torch.Tensor:
     """Returns total variation (TV) loss of the given image.

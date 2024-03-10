@@ -57,12 +57,14 @@ class TransposeConv(ConvBlock):
     """Transpose/deconvolution block."""
     def __init__(self, *args, **kwargs):
         super(TransposeConv, self).__init__(*args, **kwargs)
+        output_padding = self.kernel_size // 2
         self.conv = nn.ConvTranspose2d(
             in_channels=self.in_channels,
             out_channels=self.out_channels,
             kernel_size=self.kernel_size,
             stride=2,
             padding=self.padding_size,
+            output_padding=output_padding,
             bias=True if self.norm_type is None else False
         )
 

@@ -160,9 +160,13 @@ class VGGNetwork(nn.Module):
 
     def forward(self, image: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Runs forward pass and returns feature representations."""
-        self._feature_maps = {}
+        # clear activations from previous forward calls
+        self._feature_maps.clear()
         self.network(image)
-        return self._feature_maps
+        # return copied tensors
+        return {
+            label: feat.clone() for (label, feat) in self._feature_maps.items()
+        }
 
 
 def get_activation(
