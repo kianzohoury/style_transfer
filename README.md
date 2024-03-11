@@ -164,7 +164,10 @@ $ pip install style_transfer/.
 Unlike the other methods, Gatys et al. [1] proposed optimization directly on
 images themselves. In this manner, the pixels of an image are considered 
 parameters, and "training" involves updating the pixel values rather than
-a neural network's parameters.
+a neural network's parameters. As seen below, the images produced demonstrate
+visually high quality and visually pleasing results that preserve content well,
+but at the cost of speed (~ 75 seconds for 150 L-BFGS iterations on an NVIDIA 
+V100 GPU).
 
 <div align="center" style="margin: 0 auto;">
     <img src="examples/content/img_6.jpg" width=24%/>   
