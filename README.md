@@ -10,7 +10,11 @@ One may ask: what is the correct balance between content and style? As it turns
 out, the answer is more subjective than typical optimization/ML problems - 
 "beauty is in the eye's of the beholder", as they say. 
 
-Create image, x on left, y on right, and gif of generated image in the middle.
+<div align="center" style="margin: 0 auto;">
+    <img src="examples/content/img_2.jpg" width=32%/>
+    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" width=32%/>
+    <img src="examples/style/van_gogh_starry_night.jpeg" width=32%/>
+</div>
 
 ## Background
 
@@ -302,8 +306,8 @@ Johnson et al. [2] proposed a transformation network, which is significantly
 faster than Method I (~1000x) faster for 256 x 256 images. However, the major
 drawback with this method is that a transformation network must be trained 
 separately for each style.
+### Method III: CycleGAN
 
-     
 ### References
 [1] L. A. Gatys, A. S. Ecker, and M. Bethge, "Image Style Transfer Using Convolutional Neural Networks," in *Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2016, pp. 2414-2423. [DOI](https://doi.org/10.1109/CVPR.2016.265)
 
