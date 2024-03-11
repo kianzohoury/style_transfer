@@ -167,35 +167,35 @@ parameters, and "training" involves updating the pixel values rather than
 a neural network's parameters.
 
 <div align="center" style="margin: 0 auto;">
-    <img src="examples/content/img_6.jpg" width=20%/>   
-    <img src="examples/transfers/img_6_van_gogh_starry_night.jpg" width=20%/>
-    <img src="examples/transfers/img_6_picasso_girl_with_a_mandolin.jpg" width=20%/>
-    <img src="examples/transfers/img_6_mc_escher_sky_water.jpg" width=20%/>
+    <img src="examples/content/img_6.jpg" width=24%/>   
+    <img src="examples/transfers/img_6_van_gogh_starry_night.jpg" width=24%/>
+    <img src="examples/transfers/img_6_picasso_girl_with_a_mandolin.jpg" width=24%/>
+    <img src="examples/transfers/img_6_mc_escher_sky_water.jpg" width=24%/>
 </div>
 
 <div align="center" style="margin: 0 auto;">
-    <img src="examples/content/img_2.jpg" width=20%/>
-    <img src="examples/transfers/img_2_van_gogh_starry_night.jpg" width=20%/>
-    <img src="examples/transfers/img_2_picasso_girl_with_a_mandolin.jpg" width=20%/>
-    <img src="examples/transfers/img_2_mc_escher_sky_water.jpg" width=20%/>
+    <img src="examples/content/img_2.jpg" width=24%/>
+    <img src="examples/transfers/img_2_van_gogh_starry_night.jpg" width=24%/>
+    <img src="examples/transfers/img_2_picasso_girl_with_a_mandolin.jpg" width=24%/>
+    <img src="examples/transfers/img_2_mc_escher_sky_water.jpg" width=24%/>
 </div>
 <div align="center" style="margin: 0 auto;">
-    <img src="examples/content/img_5.jpg" width=20%/>
-    <img src="examples/transfers/img_5_van_gogh_starry_night.jpg" width=20%/>
-    <img src="examples/transfers/img_5_picasso_girl_with_a_mandolin.jpg" width=20%/>
-    <img src="examples/transfers/img_5_mc_escher_sky_water.jpg" width=20%/>
+    <img src="examples/content/img_5.jpg" width=24%/>
+    <img src="examples/transfers/img_5_van_gogh_starry_night.jpg" width=24%/>
+    <img src="examples/transfers/img_5_picasso_girl_with_a_mandolin.jpg" width=24%/>
+    <img src="examples/transfers/img_5_mc_escher_sky_water.jpg" width=24%/>
 </div>
 <div align="center" style="margin: 0 auto;">
-    <img src="examples/content/img_7.jpg" width=20%/>
-    <img src="examples/transfers/img_7_van_gogh_starry_night.jpg" width=20%/>
-    <img src="examples/transfers/img_7_picasso_girl_with_a_mandolin.jpg" width=20%/>
-    <img src="examples/transfers/img_7_mc_escher_sky_water.jpg" width=20%/>
+    <img src="examples/content/img_7.jpg" width=24%/>
+    <img src="examples/transfers/img_7_van_gogh_starry_night.jpg" width=24%/>
+    <img src="examples/transfers/img_7_picasso_girl_with_a_mandolin.jpg" width=24%/>
+    <img src="examples/transfers/img_7_mc_escher_sky_water.jpg" width=24%/>
 </div>
 <div align="center" style="margin: 0 auto;">
-    <div style="margin-left: 20%">
-        <img src="examples/style/van_gogh_starry_night.jpeg" width=25%/> 
-        <img src="examples/style/picasso_girl_with_a_mandolin.jpg" width=25%/> 
-        <img src="examples/style/mc_escher_sky_water.jpg" width=25%/> 
+    <div>
+        <img src="examples/style/van_gogh_starry_night.jpeg" width=24%/> 
+        <img src="examples/style/picasso_girl_with_a_mandolin.jpg" width=24%/> 
+        <img src="examples/style/mc_escher_sky_water.jpg" width=24%/> 
     </div>
     <figure> 
         <figcaption style="text-align: left;">
@@ -212,27 +212,49 @@ execute the following:
 ```
 python -m stylize gatys --content-src <content path> --style-src <style path> 
 ```
+Optionally, the same can be achieved by calling `stylize.run_gatys_optimization()`:
+```python
+from stylize import run_gatys_optimization
+
+stylized_img = run_gatys_optimization(
+    content_src="examples/content/tuebingen_neckarfront.jpeg",
+    style_src="examples/style/van_gogh_starry_night.jpeg",
+    ...
+)
+```
+
 #### Options
+Some of the important options are described below:
 
-`--content-src` (str): Path to content image.
+[//]: # ()
+[//]: # (`--content-src` &#40;str&#41;: Path to content image.)
 
-`--style-src` (str): Path to style image.
+[//]: # ()
+[//]: # (`--style-src` &#40;str&#41;: Path to style image.)
 
-`--image-size` (tuple or int): Shape to resize images. Default: (512, 512).
+[//]: # ()
+[//]: # (`--image-size` &#40;tuple or int&#41;: Shape to resize images. Default: &#40;512, 512&#41;.)
 
-`--center-crop` (tuple or int): Whether to center crop images. Default: True.
+[//]: # ()
+[//]: # (`--center-crop` &#40;tuple or int&#41;: Whether to center crop images. Default: True.)
 
-`--content-labels` (list, str, optional): Layers to calculate content 
-losses from. If None is specified, content representation layers are ignored; 
-otherwise, default layers are chosen.
+[//]: # ()
+[//]: # (`--content-labels` &#40;list, str, optional&#41;: Layers to calculate content )
 
-`--style-labels` (list, str, optional): Layers to calculate style losses
-from. If None is specified, style representation layers are ignored; otherwise, 
-default layers are chosen.
+[//]: # (losses from. If None is specified, content representation layers are ignored; )
+
+[//]: # (otherwise, default layers are chosen.)
+
+[//]: # ()
+[//]: # (`--style-labels` &#40;list, str, optional&#41;: Layers to calculate style losses)
+
+[//]: # (from. If None is specified, style representation layers are ignored; otherwise, )
+
+[//]: # (default layers are chosen.)
 
 `--content-weight` (float): Content loss weight. Default: 1.0.
 
-`--style-weight` (float): Style loss weight. Default: 1e3.
+`--style-weight` (float): Style loss weight. Default: 1e6.
 
 `--tv-weight` (float): Total variation regularization weight. Default: 1e-6.
 
@@ -244,8 +266,6 @@ Default: 10.
 
 `--lr` (float): Learning rate for L-BFGS optimizer. Default: 1e-3.
 
-`--device` (str): Device. Default: 'cpu'.
-
 `--init-noise` (bool): Initializes generated image with noise. Default: False.
 
 `--save-fp` (str, optional): Path to save generated image, using a valid format 
@@ -254,33 +274,17 @@ Default: 10.
 `--save-gif` If True, saves a .gif version of the image saved under `save_fp`. 
     Default: False.
 
-`--save-all` (bool): If True, saves a folder of all intermediate images
-in the same directory as `save_fp`. Default: False.
-
-`--save-losses` (bool): If True, saves the losses at each optimization
-step as .txt file in the same directory as `save_fp`. Default: False
-
-Optionally, the same can be achieved by calling `stylize.run_gatys_optimization()`.
-```python
-from stylize import run_gatys_optimization
-
-stylized_img = run_gatys_optimization(
-    content_src="examples/content/tuebingen_neckarfront.jpeg",
-    style_src="examples/style/van_gogh_starry_night.jpeg",
-    ...
-)
-```
-
+Refer to the method signature of `stylize.run_gatys_optimization()` for the full list of options.
 ### Feature Inversion
 As an aside, feature inversion can be conducted when no content
 labels are passed in, and only a single style label is passed in. Starting
 from a noise image, the image is optimized to match a single style
 layer, and the result will look like a texture image. Texture paper by Gatys et al. [add citation].
 <div align="center" style="margin: 0 auto;">
-    <img src="examples/textures/conv_1_2.jpg" width=20%/>
-    <img src="examples/textures/conv_2_2.jpg" width=20%/>
-    <img src="examples/textures/conv_3_3.jpg" width=20%/>
-    <img src="examples/textures/conv_4_3.jpg" width=20%/>
+    <img src="examples/textures/conv_1_2.jpg" width=24%/>
+    <img src="examples/textures/conv_2_2.jpg" width=24%/>
+    <img src="examples/textures/conv_3_3.jpg" width=24%/>
+    <img src="examples/textures/conv_4_3.jpg" width=24%/>
     <figure> 
         <figcaption style="text-align: left;">
             Reconstructed features from VGG16 activations layers (1) conv_1_2,
