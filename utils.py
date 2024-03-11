@@ -12,12 +12,12 @@ from typing import List, Tuple, Union
 
 # Statistics for input normalization taken from ImageNet (important
 # pre-processing step to correctly extract VGG features)
-_IMAGENET_MEAN = [0.485, 0.456, 0.406]
-_IMAGENET_STD = [0.229, 0.224, 0.225]
+IMAGENET_MEAN = [0.485, 0.456, 0.406]
+IMAGENET_STD = [0.229, 0.224, 0.225]
 
 
 class ImageDataset(Dataset):
-    """Dataset class for fiftyone zoo dataset folders.
+    """Dataset class for wrapping fiftyone zoo datasets.
 
     Note that this class is meant specifically for fiftyone datasets. To use
     another dataset, you will need to implement your own Dataset class.
@@ -42,8 +42,7 @@ class ImageDataset(Dataset):
         self.img_size = img_size
         self.transform = T.Compose([
             T.Resize(size=[img_size] * 2),
-            T.ToTensor(),
-            T.Normalize(_IMAGENET_MEAN, _IMAGENET_STD),
+            T.ToTensor()
         ])
 
     def __len__(self):
@@ -63,7 +62,7 @@ class ImageDataset(Dataset):
             self.dataset_view = self.fiftyone_dataset.match_tags(split)
             self.img_paths = list(self.dataset_view.values("filepath"))
         else:
-            raise ValueError(f"'{split}' is not a valid split")
+            raise ValueError(f"'{split}' is not a valid split.")
 
 
 def load_coco_zoo_dataset(
@@ -88,20 +87,6 @@ def load_coco_zoo_dataset(
     return ImageDataset(
         fiftyone_dataset=fiftyone_dataset, img_size=img_size
     )
-
-
-def normalize_batch(
-    img_tensor: torch.Tensor, mean: List[float], std: List[float]
-) -> torch.Tensor:
-    """Normalizes a batch of tensors. Assumes 3 channels (RGB)."""
-    batch_size = img_tensor.shape[0]
-    mean = torch.tensor(
-        mean, dtype=torch.float32
-    ).reshape((1, 3, 1, 1)).expand(batch_size, -1)
-    std = torch.tensor(
-        std, dtype=torch.float32
-    ).reshape((1, 3, 1, 1)).expand(batch_size, -1)
-    return (img_tensor - mean) / std
 
 
 def denormalize_batch(

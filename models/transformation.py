@@ -172,8 +172,12 @@ class TransformationNetwork(nn.Module):
 
         if upsample_type == "transpose":
             upsampler = TransposeConv
-        else:
+        elif upsample_type == "interpolate":
             upsampler = UpsampleConv
+        else:
+            raise ValueError(
+                f"{upsample_type} is not a valid upsampling type."
+            )
 
         # decoder blocks
         self.up1 = upsampler(
