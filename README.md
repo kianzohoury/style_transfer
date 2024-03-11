@@ -11,9 +11,9 @@ out, the answer is more subjective than typical optimization/ML problems -
 "beauty is in the eye's of the beholder", as they say. 
 
 <div align="center" style="margin: 0 auto;">
-    <img src="examples/content/img_2.jpg" width=32%/>
-    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" width=32%/>
-    <img src="examples/style/van_gogh_starry_night.jpeg" width=32%/>
+    <img src="examples/content/img_2.jpg" width=256/>
+    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" width=256/>
+    <img src="examples/style/van_gogh_starry_night.jpeg" width=256/>
 </div>
 
 ## Background
