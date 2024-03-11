@@ -10,9 +10,9 @@ import torchvision.transforms.functional as F
 from torch.optim import LBFGS
 
 
-import utils
+from . import utils
 from .models import vgg, VGGNetwork, TransformationNetwork
-from losses import perceptual_loss
+from .losses import perceptual_loss
 
 
 def run_gatys_optimization(
@@ -26,7 +26,7 @@ def run_gatys_optimization(
     style_weight: float = 1e3,
     lbfgs_iters: int = 10,
     num_steps: int = 50,
-    lr: float = 1e-3,
+    lr: float = 1e-2,
     tv_weight: float = 1e-6,
     device: str = "cpu",
     init_noise: bool = False,
@@ -83,21 +83,24 @@ def run_gatys_optimization(
 
     # Load images.
     content_image = utils.load_image(
-        filepath=content_src, size=list(image_size), device=device
+        filepath=content_src,
+        size=list(image_size) if image_size is not None else None,
+        device=device
     )
     style_image = utils.load_image(
-        filepath=style_src, size=list(image_size), device=device
+        filepath=style_src,
+        size=list(image_size) if image_size is not None else None,
+        device=device
     )
 
     # crop and normalize images
-    input_transforms = [
-        T.Normalize(mean=utils.IMAGENET_MEAN, std=utils.IMAGENET_STD)
-    ]
+    input_norm = T.Normalize(mean=utils.IMAGENET_MEAN, std=utils.IMAGENET_STD)
+    crop = T.CenterCrop(size=image_size)
     if center_crop:
-        input_transforms.append(T.CenterCrop(size=image_size))
-    input_transforms = T.Compose(input_transforms)
-    content_image = input_transforms(content_image)
-    style_image = input_transforms(style_image)
+        content_image = crop(content_image)
+        style_image = crop(style_image)
+    content_image = input_norm(content_image)
+    style_image = input_norm(style_image)
 
     # check that at least content or style is being optimized
     if not (content_labels or style_labels):
@@ -170,7 +173,7 @@ def run_gatys_optimization(
             optimizer.zero_grad()
 
             # Run forward pass to get features
-            generated_features = vgg_network(generated_image)
+            generated_features = vgg_network(input_norm(generated_image))
             generated_content, generated_style = {}, {}
             for label in content_labels:
                 generated_content[label] = generated_features[label]
@@ -259,7 +262,7 @@ def run_fast_style_transfer_batched(
     img_paths: str,
     out_dir: str,
     checkpoint: str,
-    img_size: Optional[Tuple[int, int], int] = 512,
+    img_size: Union[Tuple[int, int], int] = 512,
     device: str = "cpu",
     batch_size: int = 4
 ) -> None:
