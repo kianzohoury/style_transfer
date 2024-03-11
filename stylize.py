@@ -6,18 +6,20 @@ from typing import List, Optional, Tuple, Union
 
 import torch
 import torchvision.transforms as T
+import torchvision.transforms.functional as F
 from torch.optim import LBFGS
 
 
 import utils
 from .models import vgg, VGGNetwork, TransformationNetwork
-from losses import perceptual_loss, total_variation_loss
+from losses import perceptual_loss
 
 
 def run_gatys_optimization(
     content_src: str,
     style_src: str,
     image_size: Union[int, Tuple[int, int]] = (512, 512),
+    center_crop: bool = True,
     content_labels: Optional[Union[List[str], str]] = "default",
     style_labels: Optional[Union[List[str], str]] = "default",
     content_weight: float = 1.0,
@@ -45,6 +47,7 @@ def run_gatys_optimization(
         style_src (str): Path to style image.
         image_size (tuple or int): Shape to resize images.
             Default: (512, 512).
+        center_crop (bool): Whether to center crop the images. Default: True.
         content_labels (list, str, optional): Layers to calculate content
             losses from. If None is specified, content representation layers
             are ignored; otherwise, default layers are chosen.
@@ -85,6 +88,16 @@ def run_gatys_optimization(
     style_image = utils.load_image(
         filepath=style_src, size=list(image_size), device=device
     )
+
+    # crop and normalize images
+    input_transforms = [
+        T.Normalize(mean=utils.IMAGENET_MEAN, std=utils.IMAGENET_STD)
+    ]
+    if center_crop:
+        input_transforms.append(T.CenterCrop(size=image_size))
+    input_transforms = T.Compose(input_transforms)
+    content_image = input_transforms(content_image)
+    style_image = input_transforms(style_image)
 
     # check that at least content or style is being optimized
     if not (content_labels or style_labels):
