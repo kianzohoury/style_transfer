@@ -8,7 +8,7 @@ import torchvision.transforms.functional as F
 from torch.utils.data import Dataset
 
 from PIL import Image
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 # Statistics for input normalization taken from ImageNet (important
 # pre-processing step to correctly extract VGG features)
@@ -103,11 +103,15 @@ def denormalize_batch(
     return img_tensor * std + mean
 
 
-def load_image(filepath: str, size: List[int], device: str) -> torch.Tensor:
+def load_image(
+    filepath: str, size: Optional[List[int]] = None, device: str = "cpu"
+) -> torch.Tensor:
     """Loads image as a tensor, given a filepath, device and output size."""
     img = Image.open(fp=filepath)
     img_tensor = F.to_tensor(img).to(device).float()
-    img_tensor = F.resize(img_tensor, size=size).unsqueeze(0)
+    if size is not None:
+        img_tensor = F.resize(img_tensor, size=size)
+    img_tensor = img_tensor.unsqueeze(0)
     return img_tensor
 
 

@@ -5,10 +5,12 @@ from PIL import Image
 from typing import List, Optional, Tuple, Union
 
 import torch
+import torchvision.transforms as T
 from torch.optim import LBFGS
 
-import models
+
 import utils
+from .models import vgg, VGGNetwork, TransformationNetwork
 from losses import perceptual_loss, total_variation_loss
 
 
@@ -41,7 +43,7 @@ def run_gatys_optimization(
     Args:
         content_src (str): Path to content image.
         style_src (str): Path to style image.
-        image_size (tuple): Shape to resize images.
+        image_size (tuple or int): Shape to resize images.
             Default: (512, 512).
         content_labels (list, str, optional): Layers to calculate content
             losses from. If None is specified, content representation layers
@@ -93,21 +95,21 @@ def run_gatys_optimization(
     # if only one of content/style labels are included, the optimization task
     # is similar to feature inversion.
     if isinstance(content_labels, str) and content_labels.lower() == "default":
-        content_labels = set(models.vgg.DEFAULT_CONTENT_LAYERS)
+        content_labels = set(vgg.DEFAULT_CONTENT_LAYERS)
     elif isinstance(content_labels, list) or isinstance(content_labels, tuple):
         content_labels = set(content_labels)
     else:
         content_labels = set()
 
     if isinstance(style_labels, str) and style_labels.lower() == "default":
-        style_labels = set(models.vgg.DEFAULT_STYLE_LAYERS_16)
+        style_labels = set(vgg.DEFAULT_STYLE_LAYERS_16)
     elif isinstance(style_labels, list) or isinstance(style_labels, tuple):
         style_labels = set(style_labels)
     else:
         style_labels = set()
 
     # Load pretrained loss network (VGG16)
-    vgg_network = models.VGGNetwork(
+    vgg_network = VGGNetwork(
         feature_labels=content_labels | style_labels
     ).to(device)
     vgg_network = vgg_network.requires_grad_(False).eval()
@@ -126,13 +128,14 @@ def run_gatys_optimization(
 
     # get content and style target representations (only need to be calculated
     # once)
-    target_features = vgg_network(content_image)
-    content_targets = [
-        target_features[label].detach() for label in content_labels
-    ]
-    style_targets = [
-        target_features[label].detach() for label in style_labels
-    ]
+    content_img_features = vgg_network(content_image)
+    style_img_features = vgg_network(style_image)
+    content_targets, style_targets = {}, {}
+
+    for label in content_labels:
+        content_targets[label] = content_img_features[label].detach()
+    for label in style_labels:
+        style_targets[label] = style_img_features[label].detach()
 
     all_images, best_image, best_loss = [], None, float("inf")
     print("Starting style transfer using direct optimization...")
@@ -155,31 +158,28 @@ def run_gatys_optimization(
 
             # Run forward pass to get features
             generated_features = vgg_network(generated_image)
-            generated_content_features = [
-                generated_features[label] for label in content_labels
-            ]
-            generated_style_features = [
-                generated_features[label] for label in style_labels
-            ]
+            generated_content, generated_style = {}, {}
+            for label in content_labels:
+                generated_content[label] = generated_features[label]
+            for label in style_labels:
+                generated_style[label] = generated_features[label]
 
             # Calculate perceptual loss.
             labeled_losses = perceptual_loss(
-                generated_content=generated_content_features,
-                generated_style=generated_style_features,
+                generated_content=generated_content,
+                generated_style=generated_style,
                 content_targets=content_targets,
                 style_targets=style_targets,
+                generated_image=generated_image,
                 content_weight=content_weight,
-                style_weight=style_weight
+                style_weight=style_weight,
+                tv_weight=tv_weight
             )
 
             loss = labeled_losses["perceptual"]
             c_loss += labeled_losses["content"]
             s_loss += labeled_losses["style"]
-
-            # optionally add total variation loss
-            if tv_weight > 0:
-                tv_loss = total_variation_loss(generated_image)
-                loss += tv_weight * tv_loss
+            tv_loss += labeled_losses["tv"]
 
             loss.backward()
             return loss.item()
@@ -242,6 +242,81 @@ def run_gatys_optimization(
     return best_image
 
 
-def run_fast_style_transfer():
-    # TODO
-    pass
+def run_fast_style_transfer_batched(
+    img_paths: str,
+    out_dir: str,
+    checkpoint: str,
+    img_size: Optional[Tuple[int, int], int] = 512,
+    device: str = "cpu",
+    batch_size: int = 4
+) -> None:
+    """Runs fast style transfer using transformation networks (Johnson et al.)
+
+    Args:
+        img_paths (str): Paths to images to be transformed.
+        out_dir (str): Path to save stylized images to.
+        checkpoint (str): Checkpoint file (as a "*.pth") where the model is
+            saved.
+        img_size (tuple or in, optional): Size of the images. Note that this is
+            required since the images will be batched. Default: 512.
+        device (str). Device to run inference on. Default: 'cpu'.
+        batch_size (int): Batch size. Make sure the batch size agrees with
+            GPU memory capacity. Default: 4.
+    """
+
+    # get images
+    img_paths = Path(img_paths)
+    img_paths = list(img_paths.iterdir()) if img_paths.is_dir() else [img_paths]
+    if len(img_paths) == 0:
+        print("No images found!")
+
+    content_img = []
+    print(f"Found {len(img_paths)} images. Loading images...")
+    for path in img_paths:
+        try:
+            content_img.append(
+                utils.load_image(path, size=img_size, device=device)
+            )
+        except IOError:
+            print(f"Could not load image at {path}.")
+    # organize images into batches
+    content_img = torch.stack(content_img, dim=0)
+
+    # load checkpoint
+    state_dict = torch.load(checkpoint, map_location=device)
+    config = state_dict["config"]
+
+    # load trained model
+    model = TransformationNetwork(
+        padding_mode=config.padding_mode,
+        norm_type=config.norm_type,
+        upsample_type=config.upsample_type,
+        output_fn=config.output_fn
+    ).to(device)
+
+    # define input normalizer (basic pre-processing step)
+    input_norm = T.Normalize(
+        mean=utils.IMAGENET_MEAN, std=utils.IMAGENET_STD
+    )
+
+    # path to save images
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    model_name = Path(checkpoint).stem
+
+    num_iters = len(content_img) // batch_size
+    n_images = 0
+    for i in range(num_iters):
+        # get batch
+        img_batch = content_img[batch_size * i: batch_size * (i + 1), :, :, :]
+        # get stylized images! (inference)
+        stylized_img = model(input_norm(img_batch))
+
+        for img_idx, tensor_img in enumerate(stylized_img, 0):
+            pil_img = utils.tensor_to_image(tensor_img)
+            suffix = Path(img_paths[img_idx]).suffix
+            save_img_name = img_paths[img_idx].stem + f"_{model_name}" + suffix
+            # save to output directory
+            pil_img.save(out_dir / save_img_name)
+            n_images += 1
+    print(f"Finished. Saved images {n_images} at {img_paths}.")

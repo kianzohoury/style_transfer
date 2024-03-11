@@ -1,5 +1,5 @@
 
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import torch
 import torch.backends.cudnn
@@ -43,7 +43,7 @@ def _tv_anisotropic(x: torch.Tensor) -> torch.Tensor:
 
 
 def total_variation_loss(
-    image: torch.Tensor, isotropic: bool = True
+    image: torch.Tensor, anisotropic: bool = False
 ) -> torch.Tensor:
     """Returns normalized total variation (TV) loss of the given image.
 
@@ -60,7 +60,7 @@ def total_variation_loss(
     See https://en.wikipedia.org/wiki/Total_variation_denoising for more
     details.
     """
-    return _tv_isotropic(image) if isotropic else _tv_anisotropic(image)
+    return _tv_anisotropic(image) if anisotropic else _tv_isotropic(image)
 
 
 def style_loss(
@@ -79,15 +79,20 @@ def perceptual_loss(
     generated_style: Dict[str, torch.Tensor],
     content_targets: Dict[str, torch.Tensor],
     style_targets: Dict[str, torch.Tensor],
+    generated_image: Optional[torch.Tensor] = None,
     content_weight: float = 1.0,
-    style_weight: float = 1e3,
+    style_weight: float = 1e5,
+    tv_weight: float = 1.0e-10,
+    anisotropic: bool = False
 ) -> Dict[str, torch.Tensor]:
     """Calculates the perceptual loss, which combines content and style losses.
 
-    Returns the perceptual loss, as well as the unweighted content and style
-    losses.
+    Optionally, uses TV regularization to enhance edge preservation and pixel
+    smoothening (reduction of small artifacts/noise).
+
+    Returns the perceptual loss, as well as each loss term (unweighted).
     """
-    c_loss = s_loss = 0
+    c_loss = s_loss = tv_loss = 0
     # calculate total content loss
     for label in content_targets.keys():
         gen_feat = generated_content[label]
@@ -102,6 +107,11 @@ def perceptual_loss(
 
     # combine the losses (perceptual loss)
     loss = content_weight * c_loss + style_weight * s_loss
+
+    # add tv loss (if applicable)
+    if tv_weight > 0:
+        tv_loss = total_variation_loss(generated_image, anisotropic)
+        loss += tv_weight * tv_loss
     return {
-        "perceptual": loss, "content": c_loss, "style": s_loss
+        "perceptual": loss, "content": c_loss, "style": s_loss, "tv": tv_loss
     }
