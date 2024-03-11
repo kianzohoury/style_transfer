@@ -23,7 +23,7 @@ def run_gatys_optimization(
     content_labels: Optional[Union[List[str], str]] = "default",
     style_labels: Optional[Union[List[str], str]] = "default",
     content_weight: float = 1.0,
-    style_weight: float = 1e3,
+    style_weight: float = 1e6,
     lbfgs_iters: int = 10,
     num_steps: int = 50,
     lr: float = 1e-2,
@@ -92,6 +92,13 @@ def run_gatys_optimization(
         size=list(image_size) if image_size is not None else None,
         device=device
     )
+    # Initialize image.
+    if init_noise:
+        generated_image = torch.randn(
+            content_image.size(), device=device
+        ).requires_grad_(True)
+    else:
+        generated_image = content_image.clone().requires_grad_(True)
 
     # crop and normalize images
     input_norm = T.Normalize(mean=utils.IMAGENET_MEAN, std=utils.IMAGENET_STD)
@@ -130,13 +137,7 @@ def run_gatys_optimization(
     ).to(device)
     vgg_network = vgg_network.requires_grad_(False).eval()
 
-    # Initialize image.
-    if init_noise:
-        generated_image = torch.randn(
-            content_image.size(), device=device
-        ).requires_grad_(True)
-    else:
-        generated_image = content_image.clone().requires_grad_(True)
+
 
     # Load optimizer.
     optimizer = LBFGS([generated_image], lr=lr, max_iter=lbfgs_iters)
