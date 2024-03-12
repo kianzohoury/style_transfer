@@ -289,7 +289,7 @@ Default: 10.
 Refer to the method signature of `stylize.run_gatys_optimization()` for the full list of options.
 ### Feature Inversion
 As an aside, feature inversion can be conducted when only the style is optimized
-for the perceptual loss objective. Starting with a noise image, the gram matrix (FF^T)
+for the perceptual loss objective. Starting with a noise image, the gram matrix (G=FF^T)
 w.r.t each style layer is the signal that guides the inversion process of the
 pretrained features. The resulting image resembles a texture. For more info,
 refer to Gatys et al.'s texture paper [add citation].
