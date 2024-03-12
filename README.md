@@ -1,4 +1,8 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing)
+<script
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+  type="text/javascript">
+</script>
 
 # Exploring Artistic Style Transfer 🎨 🖼️
 PyTorch-based implementations (from scratch) of several distinct deep learning approaches [1-3] 
@@ -165,12 +169,11 @@ $ pip install style_transfer/.
 ```
 ## Usage
 ### Method I: Slow optimization
-Unlike the other methods, Gatys et al. [1] proposed optimization directly on
-images themselves. In this manner, the pixels of an image are considered 
+Unlike the other methods that require training, Gatys et al. [1] proposed optimization 
+directly on images themselves. In this manner, the pixels of an image are considered 
 parameters, and "training" involves updating the pixel values rather than
-a neural network's parameters. As seen below, the images produced demonstrate
-visually high quality and visually pleasing results that preserve content well,
-but at the cost of speed (~ 75 seconds for 150 L-BFGS iterations on an NVIDIA 
+a neural network's parameters. As seen below, the stylized images are visually
+pleasing and preserve content quite well, but are not efficient to generate (~ 75 seconds for 150 L-BFGS iterations on an NVIDIA 
 V100 GPU).
 
 <div align="center" style="margin: 0 auto;">
@@ -208,10 +211,12 @@ V100 GPU).
         <figcaption style="text-align: left;">
             Stylized images using (1) <i>Starry Night</i> by Van Gogh, (2)
             <i>Girl with a Mandolin</i> by Pablo Picasso, and (3)
-            <i> Sky and Water</i> by MC Escher. 
+            <i> Sky and Water</i> by MC Escher, using a content/style ratio = 
+                1e-6.
         </figcaption>
     </figure> 
 </div>
+
 
 To run this method from the command line, cd into `/style_transfer` and
 execute the following:
