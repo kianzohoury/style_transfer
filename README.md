@@ -288,10 +288,11 @@ Default: 10.
 
 Refer to the method signature of `stylize.run_gatys_optimization()` for the full list of options.
 ### Feature Inversion
-As an aside, feature inversion can be conducted when no content
-labels are passed in, and only a single style label is passed in. Starting
-from a noise image, the image is optimized to match a single style
-layer, and the result will look like a texture image. Texture paper by Gatys et al. [add citation].
+As an aside, feature inversion can be conducted when only the style is optimized
+for the perceptual loss objective. Starting with a noise image, the gram matrix (FF^T)
+w.r.t each style layer is the signal that guides the inversion process of the
+pretrained features. The resulting image resembles a texture. For more info,
+refer to Gatys et al.'s texture paper [add citation].
 <div align="center" style="margin: 0 auto;">
     <img src="examples/textures/conv_1_2.jpg" width=24%/>
     <img src="examples/textures/conv_2_2.jpg" width=24%/>
