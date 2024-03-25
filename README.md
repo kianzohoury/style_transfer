@@ -1,8 +1,4 @@
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing)
-<script
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
-  type="text/javascript">
-</script>
 
 # Exploring Artistic Style Transfer 🎨 🖼️
 PyTorch-based implementations (from scratch) of several distinct deep learning approaches [1-3] 
@@ -15,9 +11,7 @@ out, the answer is more subjective than typical optimization/ML problems -
 "beauty is in the eye's of the beholder", as they say. 
 
 <p align="middle" float="left">
-    <img src="examples/content/img_2.jpg" width=30%/>
-    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" height=20% width=auto/>
-    <img src="examples/style/van_gogh_starry_night.jpeg" width=30%/>
+    <img src="examples/transfers/taj_mahal_van_gogh_fast.gif" width=80%/>
 </p>
 
 ## Background
