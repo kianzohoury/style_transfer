@@ -16,7 +16,7 @@ out, the answer is more subjective than typical optimization/ML problems -
 
 <p align="middle" float="left">
     <img src="examples/content/img_2.jpg" width=30%/>
-    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" width=30%/>
+    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" height=20% width=auto/>
     <img src="examples/style/van_gogh_starry_night.jpeg" width=30%/>
 </p>
 
