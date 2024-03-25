@@ -14,11 +14,11 @@ One may ask: what is the correct balance between content and style? As it turns
 out, the answer is more subjective than typical optimization/ML problems - 
 "beauty is in the eye's of the beholder", as they say. 
 
-<div align="center" style="margin: 0 auto;">
-    <img src="examples/content/img_2.jpg" width=256/>
-    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" width=256/>
-    <img src="examples/style/van_gogh_starry_night.jpeg" width=256/>
-</div>
+<p align="middle" float="left">
+    <img src="examples/content/img_2.jpg" width=30%/>
+    <img src="examples/transfers/img_2_van_gogh_starry_night.gif" width=30%/>
+    <img src="examples/style/van_gogh_starry_night.jpeg" width=30%/>
+</p>
 
 ## Background
 
@@ -141,12 +141,6 @@ out, the answer is more subjective than typical optimization/ML problems -
 [//]: # (</p>)
 
 [//]: # (Stylized versions of _Tuebingen Neckarfront_ by Andreas Praefcke &#40;top left&#41;. )
-
-
-## Additions
-- [ ] Finish facial preservation mechanism (MTCNN, additional loss term).
-- [ ] Finish color preservation (luminance transfer)     
-- [ ] Finish training transformation network on COCO for method 2.
 
 ## Colab Notebook
 An interactive notebook can be accessed [here](https://colab.research.google.com/drive/1dHAY_yCdW-u8xuZPO_S9095S98R4O2MV?usp=sharing).
@@ -311,7 +305,7 @@ refer to Gatys et al.'s texture paper [add citation].
 Johnson et al. [2] proposed a transformation network, which is significantly 
 faster than Method I (~1000x) faster for 256 x 256 images. However, the major
 drawback with this method is that a transformation network must be trained 
-separately for each style.
+separately for each style...
 ### Method III: CycleGAN
 
 ### References
